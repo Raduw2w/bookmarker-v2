@@ -1,0 +1,160 @@
+<mat-card class="bookmarks-card">
+  <mat-card-title>Bookmarks</mat-card-title>
+  <mat-card-subtitle>Search & grouped by date</mat-card-subtitle>
+  <mat-divider></mat-divider>
+
+  <div class="toolbar">
+    <app-search-bar (search)="onSearch($event)"></app-search-bar>
+    <a mat-raised-button color="primary" routerLink="/create" class="new-btn">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      New
+    </a>
+  </div>
+
+  @if (bookmarks$ | async; as bookmarks) {
+    @if (bookmarks.length > 0) {
+
+      @let groups = (bookmarks | groupByDate);
+
+      <!-- TODAY -->
+      @if (groups.today.length) {
+        <section class="group">
+          <header class="group-header">
+            <h3>Today</h3>
+            <mat-chip-set><mat-chip>{{ groups.today.length }}</mat-chip></mat-chip-set>
+          </header>
+
+          <mat-list>
+            @for (b of groups.today; track b.id) {
+              <mat-list-item>
+                <div class="bookmark-item">
+                  <div class="bookmark-info">
+                    <a
+                      [href]="b.url"
+                      target="_blank"
+                      rel="noopener"
+                      class="title"
+                      [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
+                    ></a>
+                    <div
+                      class="url"
+                      [title]="b.url"
+                      [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
+                    ></div>
+                  </div>
+                  <span class="spacer"></span>
+                  <a mat-button color="primary" [routerLink]="['/edit', b.id]">
+                    <mat-icon aria-hidden="true">edit</mat-icon>
+                    Edit
+                  </a>
+                  <button mat-button color="warn" >
+  <mat-icon aria-hidden="true">delete</mat-icon>
+  Delete
+</button>
+
+                </div>
+                <mat-divider inset></mat-divider>
+              </mat-list-item>
+            }
+          </mat-list>
+        </section>
+
+        
+      }
+
+      <!-- YESTERDAY -->
+      @if (groups.yesterday.length) {
+        <section class="group">
+          <header class="group-header">
+            <h3>Yesterday</h3>
+            <mat-chip-set><mat-chip>{{ groups.yesterday.length }}</mat-chip></mat-chip-set>
+          </header>
+
+          <mat-list>
+            @for (b of groups.yesterday; track b.id) {
+              <mat-list-item>
+                <div class="bookmark-item">
+                  <div class="bookmark-info">
+                    <a
+                      [href]="b.url"
+                      target="_blank"
+                      rel="noopener"
+                      class="title"
+                      [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
+                    ></a>
+                    <div
+                      class="url"
+                      [title]="b.url"
+                      [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
+                    ></div>
+                  </div>
+                  <span class="spacer"></span>
+                  <a mat-button color="primary" [routerLink]="['/edit', b.id]">
+                    <mat-icon aria-hidden="true">edit</mat-icon>
+                    Edit
+                  </a>
+                </div>
+                <mat-divider inset></mat-divider>
+              </mat-list-item>
+            }
+          </mat-list>
+        </section>
+      }
+
+      <!-- OLDER -->
+      @if (groups.older.length) {
+        <section class="group">
+          <header class="group-header">
+            <h3>Older</h3>
+            <mat-chip-set><mat-chip>{{ groups.older.length }}</mat-chip></mat-chip-set>
+          </header>
+
+          <mat-list>
+            @for (b of groups.older; track b.id) {
+              <mat-list-item>
+                <div class="bookmark-item">
+                  <div class="bookmark-info">
+                    <a
+                      [href]="b.url"
+                      target="_blank"
+                      rel="noopener"
+                      class="title"
+                      [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
+                    ></a>
+                    <div
+                      class="url"
+                      [title]="b.url"
+                      [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
+                    ></div>
+                  </div>
+                  <span class="spacer"></span>
+                  <a mat-button color="primary" [routerLink]="['/edit', b.id]">
+                    <mat-icon aria-hidden="true">edit</mat-icon>
+                    Edit
+                  </a>
+                </div>
+                <mat-divider inset></mat-divider>
+              </mat-list-item>
+            }
+          </mat-list>
+        </section>
+      }
+
+    } @else {
+      <div class="state empty">
+        <mat-icon>bookmark_border</mat-icon>
+        <p>No bookmarks found.</p>
+        <a routerLink="/create" mat-raised-button color="accent">Create one</a>
+      </div>
+    }
+  } @else {
+    <div class="state loading">
+      <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+      <span>Loading bookmarks…</span>
+    </div>
+  }
+
+  @if (errorMsg(); as msg) {
+  <app-error-banner [message]="msg" [retry]="retry"></app-error-banner>
+}
+</mat-card>

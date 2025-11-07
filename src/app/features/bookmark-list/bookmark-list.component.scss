@@ -1,0 +1,122 @@
+.bookmarks-card {
+  padding: 1rem;
+
+  mat-card-title { font-weight: 600; }
+  mat-card-subtitle { margin-bottom: .25rem; opacity: .8; }
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 1rem 0;
+
+  .new-btn {
+    white-space: nowrap;
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+}
+
+/* Groups */
+.group {
+  margin-top: 1.25rem;
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 .5rem;
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    mat-chip-set {
+      --mdc-chip-container-height: 24px;
+
+      mat-chip {
+        font-size: .75rem;
+        opacity: .85;
+      }
+    }
+  }
+}
+
+/* Items */
+.bookmark-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: .25rem 0;
+
+  .bookmark-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; // allow truncation
+
+    .title {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      text-decoration: none;
+
+      .open-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+        opacity: .7;
+        transition: opacity .15s ease;
+      }
+
+      &:hover .open-icon { opacity: 1; }
+    }
+
+    .url {
+      font-size: 12px;
+      opacity: .7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 560px;
+
+      @media (max-width: 768px) { max-width: 240px; }
+    }
+  }
+
+  .spacer { flex: 1; }
+}
+
+/* States */
+.state {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: rgba(0, 0, 0, .6);
+
+  &.empty {
+    flex-direction: column;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 36px;
+      height: 36px;
+      width: 36px;
+      opacity: .6;
+    }
+
+    p { margin: 0; }
+  }
+}
+
+/* Divider spacing inside lists */
+mat-list-item + mat-list-item mat-divider[inset] {
+  margin-left: 16px;
+}

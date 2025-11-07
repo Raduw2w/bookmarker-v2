@@ -1,12 +1,27 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+// import { ApplicationConfig } from '@angular/core';
+// import { provideRouter } from '@angular/router';
+// import { routes } from './app.routes';
+// import { provideHttpClient } from '@angular/common/http';
 
-import { routes } from './app.routes';
+// export const appConfig: ApplicationConfig = {
+//   providers: [
+//     provideRouter(routes),
+//     provideHttpClient()
+//   ],
+// };
 
-export const appConfig: ApplicationConfig = {
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { bookmarksReducer } from './core/state/bookmarks/bookmarks.reducer';
+import { BookmarksEffects } from './core/state/bookmarks/bookmarks.effects';
+import { provideHttpClient } from '@angular/common/http';
+
+export const appConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes)
-  ]
+    provideHttpClient(),
+    provideStore({ bookmarks: bookmarksReducer }),
+    provideEffects([BookmarksEffects]),
+    provideStoreDevtools({ maxAge: 25, logOnly: false }),
+  ],
 };

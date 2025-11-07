@@ -1,0 +1,28 @@
+<div class="bookmark-item">
+  <div class="bookmark-content">
+    <div class="bookmark-header">
+      <img [src]="getFaviconUrl(bookmark.url)" 
+           [alt]="bookmark.title + ' favicon'"
+           class="favicon"
+           (error)="$event.target.src = '/assets/images/default-favicon.ico'">
+      <h3 class="title">{{ truncateText(bookmark.title) }}</h3>
+    </div>
+    
+<h1>TEST</h1>    
+    <div class="bookmark-footer">
+      <a [href]="bookmark.url" 
+         target="_blank" 
+         rel="noopener noreferrer" 
+         class="visit-link">
+        Visit Site
+      </a>
+      
+      <div class="actions">
+        <a [routerLink]="['/bookmarks', bookmark.id, 'edit']" 
+           class="edit-button">
+          Edit
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

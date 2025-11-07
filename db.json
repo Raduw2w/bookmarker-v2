@@ -1,0 +1,34 @@
+{
+  "bookmarks": [
+    {
+      "id": "1",
+      "title": "Angular2",
+      "url": "https://angular.dev",
+      "createdAt": "2025-11-06T10:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "title": "RxJS Docs",
+      "url": "https://rxjs.dev",
+      "createdAt": "2025-11-05T09:00:00.000Z"
+    },
+    {
+      "id": "af7f",
+      "title": "zzzz",
+      "url": "https://www.youtube.com/watch?v=c_F0vetX--8&list=RDc_F0vetX--8&start_radio=1",
+      "createdAt": "2025-11-07T15:11:27.312Z"
+    },
+    {
+      "id": "930d",
+      "title": "tetetet",
+      "url": "https://www.youtube.com",
+      "createdAt": "2025-11-07T17:02:04.219Z"
+    },
+    {
+      "id": "c0b9",
+      "title": "Teethe-009",
+      "url": "https://www.youtube.com/watch?v=WXqbEG6vCgk&list=RDWXqbEG6vCgk&start_radio=1",
+      "createdAt": "2025-11-07T17:07:40.216Z"
+    }
+  ]
+}
