@@ -5,11 +5,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { debounceTime, distinctUntilChanged, startWith, map } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule,MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule],
   templateUrl: './search-bar.component.html',
   styles: [`.full{width:100%;}`]
 })

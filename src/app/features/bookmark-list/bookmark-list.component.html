@@ -42,14 +42,15 @@
                       ></div>
                     </div>
                     <span class="spacer"></span>
-                    <a mat-button color="primary" [routerLink]="['/edit', b.id]">
-                      <mat-icon aria-hidden="true">edit</mat-icon>
-                      <span>Edit</span>
-                    </a>
-                    <button mat-button color="warn" (click)="deleteBookmark(b)">
-                      <mat-icon aria-hidden="true">delete</mat-icon>
-                      Delete
-                    </button>
+                   <a mat-button color="primary" [routerLink]="['/edit', b.id]">
+  <mat-icon aria-hidden="true">edit</mat-icon>
+  <span>Edit</span>
+</a>
+<button mat-button color="warn" (click)="deleteBookmark(b)">
+  <mat-icon aria-hidden="true">delete</mat-icon>
+  Delete
+</button>
+
                   </div>
                   <mat-divider inset></mat-divider>
                 </mat-list-item>
@@ -144,10 +145,11 @@
       }
     } @else {
       <!-- Fallback while stream hasn’t emitted yet -->
-      <div class="state loading">
-        
-        <span>Loading bookmarks…</span>
-      </div>
+     <div class="state loading" role="status" aria-live="polite">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  <span>Loading bookmarks…</span>
+</div>
+
     }
   
 

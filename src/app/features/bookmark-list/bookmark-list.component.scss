@@ -1,38 +1,247 @@
-.bookmarks-card {
-  padding: 1rem;
+// .bookmarks-card {
+//   padding: 1rem;
 
-  mat-card-title { font-weight: 600; }
-  mat-card-subtitle { margin-bottom: .25rem; opacity: .8; }
+//   mat-card-title { font-weight: 600; }
+//   mat-card-subtitle { margin-bottom: .25rem; opacity: .8; }
+// }
+
+// /* Toolbar */
+// .toolbar {
+//   display: flex;
+//   gap: 12px;
+//   align-items: center;
+//   margin: 1rem 0;
+
+//   .new-btn {
+//     white-space: nowrap;
+//     display: inline-flex;
+//     gap: 6px;
+//     align-items: center;
+//   }
+// }
+
+// /* Groups */
+// .group {
+//   margin-top: 1.25rem;
+
+//   .group-header {
+//     display: flex;
+//     align-items: center;
+//     gap: 12px;
+//     margin: 0 0 .5rem;
+
+//     h3 {
+//       font-size: 1rem;
+//       font-weight: 600;
+//       margin: 0;
+//     }
+
+//     mat-chip-set {
+//       --mdc-chip-container-height: 24px;
+
+//       mat-chip {
+//         font-size: .75rem;
+//         opacity: .85;
+//       }
+//     }
+//   }
+// }
+
+// /* Items */
+// .bookmark-item {
+//   width: 100%;
+//   display: flex;
+//   align-items: center;
+//   padding: .25rem 0;
+
+//   .bookmark-info {
+//     display: flex;
+//     flex-direction: column;
+//     min-width: 0; // allow truncation
+
+//     .title {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 6px;
+//       font-weight: 500;
+//       text-decoration: none;
+
+//       .open-icon {
+//         font-size: 18px;
+//         height: 18px;
+//         width: 18px;
+//         opacity: .7;
+//         transition: opacity .15s ease;
+//       }
+
+//       &:hover .open-icon { opacity: 1; }
+//     }
+
+//     .url {
+//       font-size: 12px;
+//       opacity: .7;
+//       white-space: nowrap;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       max-width: 560px;
+
+//       @media (max-width: 768px) { max-width: 240px; }
+//     }
+//   }
+
+//   .spacer { flex: 1; }
+// }
+
+// /* States */
+// .state {
+//   display: flex;
+//   gap: 10px;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 1rem;
+//   color: rgba(0, 0, 0, .6);
+
+//   &.empty {
+//     flex-direction: column;
+//     gap: 8px;
+
+//     mat-icon {
+//       font-size: 36px;
+//       height: 36px;
+//       width: 36px;
+//       opacity: .6;
+//     }
+
+//     p { margin: 0; }
+//   }
+// }
+
+// /* Divider spacing inside lists */
+// mat-list-item + mat-list-item mat-divider[inset] {
+//   margin-left: 16px;
+// }
+
+/* === Modern Bookmarks Styles (drop-in replacement) === */
+
+
+:host {
+  display: block;
+  /* helps sticky toolbar respect parent context */
+  contain: content;
+  font-family: 'Nunito', 'Roboto', Arial, sans-serif;
+}
+
+/* Design tokens (tweak as you like) */
+$radius: 16px;
+$radius-inner: 12px;
+$easing: cubic-bezier(.2, .8, .2, 1);
+$shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08);
+$shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
+
+.bookmarks-card {
+  padding: 1rem 1rem 1.25rem;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  border: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+
+  /* Put the SOLID layer first (on top) and clip to padding-box,
+     then the GRADIENT under it clipped to border-box. */
+  background:
+    var(--mat-card-background-color, var(--mdc-elevated-card-container-color, #fff)) padding-box,
+    linear-gradient(180deg, color-mix(in oklab, currentColor 4%, transparent), transparent 32%) border-box;
+
+  transition: box-shadow .24s $easing, transform .24s $easing, border-color .24s $easing;
+
+  &:hover {
+    box-shadow: $shadow-hover;
+    transform: translateY(-1px);
+    border-color: color-mix(in oklab, currentColor 14%, transparent);
+  }
+
+  mat-card-title {
+    font-weight: 700;
+    letter-spacing: .2px;
+    margin-bottom: .1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+
+    /* subtle pill accent behind title */
+    &::after {
+      content: '';
+      height: 8px;
+      width: 48px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--mat-primary, #6750A4) 36%, transparent);
+      opacity: .25;
+      display: inline-block;
+      transform: translateY(4px);
+    }
+  }
+
+  mat-card-subtitle {
+    margin-bottom: .25rem;
+    opacity: .75;
+  }
 }
 
 /* Toolbar */
 .toolbar {
+  position: sticky;
+  top: 0; /* sits under app toolbar if any */
+  z-index: 1;
   display: flex;
   gap: 12px;
   align-items: center;
-  margin: 1rem 0;
+  margin: .75rem 0 1rem;
+  padding: .5rem;
+  border-radius: $radius-inner;
+  backdrop-filter: saturate(140%) blur(6px);
+  border: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+
+  /* Let search bar grow if it’s your component */
+  app-search-bar { flex: 1 1 auto; min-width: 160px; }
 
   .new-btn {
     white-space: nowrap;
     display: inline-flex;
     gap: 6px;
     align-items: center;
+    border-radius: 999px;
+    text-transform: none;
+
+    /* fun entrance & hover micro-interaction */
+    animation: pop-in .28s $easing both;
+    transform-origin: center;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px color-mix(in oklab, var(--mat-primary, #6750A4) 22%, transparent);
+    }
   }
 }
 
 /* Groups */
 .group {
   margin-top: 1.25rem;
+  padding: .25rem 0;
 
   .group-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin: 0 0 .5rem;
+    padding: .25rem .25rem;
+    border-radius: 10px;
+
+    /* slide in on first paint */
+    animation: slide-fade-in .35s $easing both;
 
     h3 {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: .975rem;
+      font-weight: 700;
+      letter-spacing: .2px;
       margin: 0;
     }
 
@@ -41,7 +250,10 @@
 
       mat-chip {
         font-size: .75rem;
-        opacity: .85;
+        opacity: .9;
+        border-radius: 999px;
+        transform: translateZ(0); /* enable GPU */
+        animation: chip-pop .26s $easing both;
       }
     }
   }
@@ -52,7 +264,27 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding: .25rem 0;
+  gap: .5rem;
+  padding: .375rem .25rem;
+  border-radius: 10px;
+  position: relative;
+  transition: background .18s $easing, transform .18s $easing, box-shadow .18s $easing;
+
+  /* subtle sheen on hover like a ripple highlight */
+  &:hover {
+    background: color-mix(in oklab, currentColor 6%, transparent);
+  }
+
+  /* pressed state */
+  &:active {
+    transform: translateY(0.5px) scale(.998);
+  }
+
+  /* focus ring for a11y (when tabbing to buttons/links inside) */
+  &:has(a:focus-visible, button:focus-visible) {
+    outline: 3px solid color-mix(in oklab, var(--mat-primary, #6750A4) 42%, transparent);
+    outline-offset: 2px;
+  }
 
   .bookmark-info {
     display: flex;
@@ -63,60 +295,170 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-weight: 500;
+      font-weight: 600;
+      line-height: 1.25;
       text-decoration: none;
+      color: inherit;
+      max-width: clamp(240px, 60vw, 720px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: text-underline-offset .18s $easing;
 
-      .open-icon {
-        font-size: 18px;
-        height: 18px;
-        width: 18px;
-        opacity: .7;
-        transition: opacity .15s ease;
-      }
-
-      &:hover .open-icon { opacity: 1; }
+      &:hover { text-decoration: underline; text-underline-offset: 2px; }
     }
 
     .url {
       font-size: 12px;
-      opacity: .7;
+      opacity: .72;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 560px;
+      max-width: clamp(200px, 50vw, 560px);
 
       @media (max-width: 768px) { max-width: 240px; }
     }
   }
 
   .spacer { flex: 1; }
+
+  a[mat-button], button[mat-button] {
+    border-radius: 999px;
+    text-transform: none;
+    height: 34px;
+    line-height: 34px;
+
+    mat-icon {
+      font-size: 18px;
+      height: 18px; width: 18px;
+    }
+  }
+
+  /* subtle dividing line inside list */
+  + mat-divider[inset] {
+    margin-left: 16px;
+  }
 }
 
-/* States */
+/* List item container hover (wraps .bookmark-item) */
+mat-list-item {
+  border-radius: 12px;
+  --_hover-bg: color-mix(in oklab, currentColor 8%, transparent);
+
+  transition: background .18s $easing;
+  &:hover { background: var(--_hover-bg); }
+}
+
+/* Empty & Loading states */
 .state {
   display: flex;
   gap: 10px;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 1.25rem;
   color: rgba(0, 0, 0, .6);
+  text-align: center;
 
   &.empty {
     flex-direction: column;
     gap: 8px;
 
     mat-icon {
-      font-size: 36px;
-      height: 36px;
-      width: 36px;
+      font-size: 40px;
+      height: 40px; width: 40px;
       opacity: .6;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.12));
+      animation: float 3s ease-in-out infinite;
     }
 
-    p { margin: 0; }
+    p { margin: .25rem 0 0; }
+  }
+
+  &.loading {
+    width: 100%;
+    min-height: 72px;
+    border-radius: $radius-inner;
+    position: relative;
+    overflow: hidden;
+    background: color-mix(in oklab, currentColor 6%, transparent);
+
+    /* skeleton shimmer */
+    &::before {
+      content: '';
+      position: absolute; inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in oklab, #fff 70%, transparent) 50%,
+        transparent 100%
+      );
+      animation: shimmer 1.2s $easing infinite;
+    }
+
+    span { opacity: .001; } /* keep for a11y/DOM without showing text */
   }
 }
 
-/* Divider spacing inside lists */
+/* Divider spacing inside lists (kept from your original) */
 mat-list-item + mat-list-item mat-divider[inset] {
   margin-left: 16px;
 }
+
+/* --- Animations --- */
+@keyframes slide-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes chip-pop {
+  from { transform: scale(.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+@keyframes pop-in {
+  0% { transform: scale(.98); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-4px); }
+}
+
+/* --- Dark mode polish --- */
+@media (prefers-color-scheme: dark) {
+  .bookmarks-card {
+    border-color: color-mix(in oklab, currentColor 22%, transparent);
+    /* solid on TOP (padding-box), gradient UNDER (border-box) */
+    background:
+      var(--mat-card-background-color, #1b1b1b) padding-box,
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, currentColor 6%, transparent),
+        transparent 32%
+      ) border-box;
+  }
+
+  .toolbar {
+    /* remove heavy tint; match card surface */
+    border-color: color-mix(in oklab, currentColor 22%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    backdrop-filter: none; /* avoid extra “fog” in dark mode */
+  }
+
+  .state { color: rgba(255,255,255,.78); }
+}
+
+
+/* --- Respect reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.state.loading { background: transparent; }
+.state.loading::before { display: none; }
+

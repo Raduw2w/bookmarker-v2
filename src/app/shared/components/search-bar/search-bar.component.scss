@@ -1,23 +1,59 @@
-.search-bar {
+.search-field {
   width: 100%;
-  
-  .search-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 1rem;
-    color: var(--text-primary);
-    background-color: var(--surface);
-    transition: border-color 0.2s ease;
+  --mdc-filled-text-field-container-shape: 12px;
+  --mdc-filled-text-field-container-color: color-mix(in oklab, currentColor 6%, transparent);
 
-    &::placeholder {
-      color: var(--text-secondary);
-    }
+  /* Remove the underline (active indicator) completely */
+  --mdc-filled-text-field-active-indicator-height: 0;
+  --mdc-filled-text-field-focus-active-indicator-color: transparent;
+  --mdc-filled-text-field-active-indicator-color: transparent;
 
-    &:focus {
-      outline: none;
-      border-color: var(--primary);
+  /* Clean background transitions */
+  .mat-mdc-text-field-wrapper {
+    background: var(--mdc-filled-text-field-container-color);
+    border-radius: 12px;
+    box-shadow: none;
+    transition: background .2s ease, box-shadow .2s ease;
+  }
+
+  &:hover .mat-mdc-text-field-wrapper {
+    background: color-mix(in oklab, currentColor 10%, transparent);
+  }
+
+  &:focus-within .mat-mdc-text-field-wrapper {
+    background: color-mix(in oklab, var(--mat-primary, #6750A4) 10%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--mat-primary, #6750A4) 35%, transparent);
+  }
+
+  /* Adjust padding to keep it compact */
+  .mat-mdc-form-field-infix {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+  }
+
+  /* Prefix + suffix icons */
+  .mat-mdc-form-field-icon-prefix,
+  .mat-mdc-form-field-icon-suffix {
+    opacity: .75;
+    transition: opacity .15s ease;
+  }
+
+  &:focus-within .mat-mdc-form-field-icon-prefix {
+    opacity: 1;
+  }
+
+  input[matInput] {
+    font-size: .95rem;
+    line-height: 1.3;
+  }
+
+  .clear-btn {
+    height: 36px;
+    width: 36px;
+    border-radius: 999px;
+
+    &:hover {
+      background: color-mix(in oklab, currentColor 8%, transparent);
     }
   }
 }

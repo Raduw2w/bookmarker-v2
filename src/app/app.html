@@ -1,11 +1,21 @@
-  <mat-toolbar color="primary">
-      <span>Bookmarker</span>
-      <span class="spacer"></span>
-      <a mat-button routerLink="/">List</a>
-      <a mat-raised-button color="accent" routerLink="/create">
-        addNew
-      </a>
-    </mat-toolbar>
-    <main class="container">
-      <router-outlet></router-outlet>
-    </main>
+<mat-toolbar class="navbar" color="primary">
+  <a routerLink="/" class="brand" aria-label="Go to homepage">
+    <span class="title">Bookmarker</span>
+  </a>
+
+  <span class="spacer"></span>
+
+  <nav class="nav-links">
+    <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      List
+    </a>
+    <a mat-flat-button color="accent" routerLink="/create" class="new-btn">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      New
+    </a>
+  </nav>
+</mat-toolbar>
+
+<main class="container">
+  <router-outlet></router-outlet>
+</main>

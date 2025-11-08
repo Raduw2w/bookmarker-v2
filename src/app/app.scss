@@ -1,0 +1,67 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #121212; // dark background
+  color: #e0e0e0;
+}
+
+.navbar {
+  background-color: #1e1e1e !important; // override Angular Material default
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  text-decoration: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #b0b0b0;
+  margin-left: 1rem;
+  transition: color 0.2s ease;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+  color: #ffffff;
+}
+
+.new-btn {
+  background-color: #00bfa5 !important; // teal accent
+  color: #ffffff !important;
+  border-radius: 8px;
+  padding: 0 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  text-transform: none;
+}
+
+.new-btn:hover {
+  background-color: #1de9b6 !important;
+}
+
+
+.container {
+  flex: 1;
+  padding: 2rem;
+  background-color: #181818;
+  color: #e0e0e0;
+}
+
+

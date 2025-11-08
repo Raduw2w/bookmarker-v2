@@ -1,14 +1,9 @@
-<mat-form-field appearance="outline" class="full">
+<mat-form-field appearance="fill" class="search-field">
+  <mat-icon matPrefix>search</mat-icon>
   <mat-label>Search bookmarks</mat-label>
-  <input
-    matInput
-    type="search"
-    [formControl]="q"
-    placeholder="Type to filter..."
-    autocomplete="off"
-  />
+  <input matInput type="search" [formControl]="q" placeholder="Type to filter…" />
   @if (q.value) {
-    <button mat-icon-button matSuffix aria-label="Clear" (click)="q.setValue('')">
+    <button mat-icon-button matSuffix type="button" (click)="q.setValue('')">
       <mat-icon>close</mat-icon>
     </button>
   }
