@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api": "json-server --watch db.json --port 3000"
+    "json:server": "json-server --watch db.json json-server.config.json"
   },
   "prettier": {
     "printWidth": 100,
@@ -28,14 +28,13 @@
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
     "@angular/forms": "^20.3.0",
-    "@angular/material": "^20.2.11",
+    "@angular/material": "^20.2.12",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@ngrx/effects": "^20.1.0",
     "@ngrx/entity": "^20.1.0",
     "@ngrx/store": "^20.1.0",
     "@ngrx/store-devtools": "^20.1.0",
-    "angular-in-memory-web-api": "^0.20.0",
     "fuse.js": "^7.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

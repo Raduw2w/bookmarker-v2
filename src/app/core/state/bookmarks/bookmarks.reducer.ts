@@ -1,72 +1,71 @@
+import { createFeature, createReducer, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
-import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { BookmarksActions } from './bookmarks.actions';
 import { Bookmark } from '../../models/bookmark.model';
 
-export interface BookmarksState extends EntityState<Bookmark> {
+export interface State extends EntityState<Bookmark> {
   loading: boolean;
   error: string | null;
 }
 
-export const adapter = createEntityAdapter<Bookmark>({
-  // 🔑 normalize IDs to string for the store
-  selectId: (b) => String(b.id),
-  // newest first by ISO string
-  sortComparer: (a, b) => String(b.createdAt).localeCompare(String(a.createdAt)),
+/** Keep store sorted newest → oldest (by createdAt) */
+const adapter = createEntityAdapter<Bookmark>({
+  selectId: (b) => String(b.id), // supports number|string ids
+  sortComparer: (a, b) => b.createdAt.localeCompare(a.createdAt),
 });
 
-const initialState: BookmarksState = adapter.getInitialState({
+const initialState: State = adapter.getInitialState({
   loading: false,
   error: null,
 });
 
-export const bookmarksFeature = createFeature({
-  name: 'bookmarks',
-  reducer: createReducer(
-    initialState,
+const featureReducer = createReducer(
+  initialState,
 
-    on(BookmarksActions.load, (state) => ({ ...state, loading: true, error: null })),
-    on(BookmarksActions.loadSuccess, (state, { bookmarks }) =>
-      adapter.setAll(bookmarks, { ...state, loading: false })
-    ),
-    on(BookmarksActions.loadFailure, (state, { error }) => ({ ...state, loading: false, error })),
-
-    on(BookmarksActions.create, (state) => ({ ...state, loading: true })),
-    on(BookmarksActions.createSuccess, (state, { bookmark }) =>
-      adapter.addOne(bookmark, { ...state, loading: false })
-    ),
-    on(BookmarksActions.createFailure, (state, { error }) => ({ ...state, loading: false, error })),
-
-    on(BookmarksActions.update, (state) => ({ ...state, loading: true })),
-    on(BookmarksActions.updateSuccess, (state, { bookmark }) =>
-      adapter.upsertOne(bookmark, { ...state, loading: false })
-    ),
-    on(BookmarksActions.updateFailure, (state, { error }) => ({ ...state, loading: false, error })),
-
-    on(BookmarksActions.delete, (state) => ({ ...state, loading: true })),
-    on(BookmarksActions.deleteSuccess, (state, { id }) =>
-      // 🔑 make sure we remove by the normalized string id
-      adapter.removeOne(String(id), { ...state, loading: false })
-    ),
-    on(BookmarksActions.deleteFailure, (state, { error }) => ({ ...state, loading: false, error })),
+  // LOAD
+  on(BookmarksActions.load, (state) => ({ ...state, loading: true, error: null })),
+  on(BookmarksActions.loadSuccess, (state, { items }) =>
+    adapter.setAll(items, { ...state, loading: false, error: null })
   ),
+  on(BookmarksActions.loadFailure, (state, { error }) => ({ ...state, loading: false, error })),
+
+  // CREATE
+  on(BookmarksActions.create, (state) => ({ ...state, error: null })),
+  on(BookmarksActions.createSuccess, (state, { item }) => adapter.addOne(item, state)),
+  on(BookmarksActions.createFailure, (state, { error }) => ({ ...state, error })),
+
+  // UPDATE
+  on(BookmarksActions.update, (state) => ({ ...state, error: null })),
+  on(BookmarksActions.updateSuccess, (state, { item }) => adapter.upsertOne(item, state)),
+  on(BookmarksActions.updateFailure, (state, { error }) => ({ ...state, error })),
+
+  // DELETE
+  on(BookmarksActions.delete, (state) => ({ ...state, error: null })),
+  on(BookmarksActions.deleteSuccess, (state, { id }) => adapter.removeOne(String(id), state)),
+  on(BookmarksActions.deleteFailure, (state, { error }) => ({ ...state, error }))
+);
+
+export const bookmarksFeature = createFeature({
+  name: 'bookmarks', // must match provideStore({ bookmarks: ... })
+  reducer: featureReducer,
 });
 
-export const {
-  name: bookmarksFeatureKey,
+const {
+  name: BOOKMARKS_FEATURE_KEY,
   reducer: bookmarksReducer,
   selectBookmarksState,
 } = bookmarksFeature;
 
-const selectors = adapter.getSelectors(selectBookmarksState);
-export const { selectAll: selectAllBookmarks, selectEntities: selectBookmarkEntities } = selectors;
+export { BOOKMARKS_FEATURE_KEY, bookmarksReducer };
 
-export const selectLoading = createSelector(
-  selectBookmarksState,
-  (s) => s.loading
-);
+/** Entity selectors */
+const entitySelectors = adapter.getSelectors();
 
-export const selectError = createSelector(
-  selectBookmarksState,
-  (s) => s.error
-);
+export const selectAllBookmarks = (s: any) => entitySelectors.selectAll(selectBookmarksState(s));
+
+export const selectBookmarkEntities = (s: any) =>
+  entitySelectors.selectEntities(selectBookmarksState(s));
+
+export const selectBookmarksLoading = (s: any) => selectBookmarksState(s).loading;
+
+export const selectError = (s: any) => selectBookmarksState(s).error;

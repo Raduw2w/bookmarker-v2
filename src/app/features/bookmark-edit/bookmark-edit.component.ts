@@ -1,11 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  signal,
-  inject,
-  ChangeDetectorRef,
-  OnInit,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,91 +6,80 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { BookmarkService } from '../../core/services/bookmark.service';
+
+import { Store } from '@ngrx/store';
+import { selectBookmarkEntities } from '../../core/state/bookmarks/bookmarks.reducer';
+import { BookmarksActions } from '../../core/state/bookmarks/bookmarks.actions';
 import { Bookmark } from '../../core/models/bookmark.model';
-import { switchMap } from 'rxjs';
+import { map, filter, take, tap } from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-bookmark-edit',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './bookmark-edit.component.html',
-  styles: [
-    `
-      .w-full {
-        width: 100%;
-      }
-      .actions {
-        display: flex;
-        gap: 0.75rem;
-        justify-content: flex-end;
-        margin-top: 1rem;
-      }
-    `,
-  ],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  styles: [`
+    .w-full{width:100%}
+    .actions{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1rem}
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookmarkEditComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private api = inject(BookmarkService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  private cdr = inject(ChangeDetectorRef); // 👈 add this
+  private store = inject(Store);
 
   saving = signal(false);
-  bookmark!: Bookmark;
+  id!: string;                // keep as string; reducer uses String(id) for keys
+  bookmark!: Bookmark;        // current entity (after it’s found)
 
   form = this.fb.group({
     title: ['', Validators.required],
     url: ['', [Validators.required, Validators.pattern('https?://.+')]],
   });
 
-  ngOnInit() {
-    // inside ngOnInit of BookmarkEditComponent
-    this.route.paramMap
-      .pipe(
-        switchMap((params) => {
-          const raw = params.get('id');
-          if (!raw) throw new Error('Missing id');
-          const n = Number(raw);
-          const id: number | string = Number.isFinite(n) ? n : raw;
-          console.log('[Edit] loading id:', id); // TEMP
-          return this.api.get(id);
-        })
-      )
-      .subscribe({
-        next: (b) => {
-          this.bookmark = b;
-          this.form.patchValue({ title: b.title, url: b.url }, { emitEvent: false });
-        },
-        error: (err) => {
-          console.error('[Edit] failed to load:', err);
-          this.router.navigateByUrl('/'); // optional
-        },
-      });
-  }
+  ngOnInit(): void {
+    const raw = this.route.snapshot.paramMap.get('id');
+    if (!raw) {
+      this.router.navigateByUrl('/');
+      return;
+    }
+    this.id = raw; // keys in entity adapter are strings
 
-  save() {
-    if (this.form.invalid || this.saving()) return;
-    this.saving.set(true);
-    const updated: Bookmark = {
-      ...this.bookmark,
-      ...(this.form.value as { title: string; url: string }),
-    };
-    this.api.update(updated).subscribe({
-      next: () => this.router.navigateByUrl('/'),
-      error: () => this.saving.set(false),
+    // Try to read from store; if missing, trigger a load (deep link support)
+    this.store.select(selectBookmarkEntities).pipe(
+      tap(entities => {
+        if (!entities || !entities[this.id]) {
+          this.store.dispatch(BookmarksActions.load());
+        }
+      }),
+      map(entities => entities?.[this.id]),
+      filter((b): b is Bookmark => !!b), // wait until entity appears
+      take(1)
+    ).subscribe({
+      next: (b) => {
+        this.bookmark = b;
+        this.form.reset({ title: b.title, url: b.url }, { emitEvent: false });
+      },
+      error: () => this.router.navigateByUrl('/')
     });
   }
 
-  cancel() {
+  save(): void {
+    if (this.form.invalid || this.saving()) return;
+    this.saving.set(true);
+
+    const { title, url } = this.form.value as { title: string; url: string };
+    this.store.dispatch(
+      BookmarksActions.update({ id: this.id, changes: { title, url } })
+    );
+
+    // Simple optimistic nav; if you prefer, navigate on updateSuccess in an effect
+    this.router.navigateByUrl('/');
+  }
+
+  cancel(): void {
     this.router.navigateByUrl('/');
   }
 }

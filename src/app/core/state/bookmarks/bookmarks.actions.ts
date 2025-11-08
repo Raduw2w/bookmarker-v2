@@ -5,19 +5,19 @@ export const BookmarksActions = createActionGroup({
   source: 'Bookmarks',
   events: {
     'Load': emptyProps(),
-    'Load Success': props<{ bookmarks: Bookmark[] }>(),
+    'Load Success': props<{ items: Bookmark[] }>(),
     'Load Failure': props<{ error: string }>(),
 
-    'Create': props<{ payload: Omit<Bookmark, 'id'> }>(),
-    'Create Success': props<{ bookmark: Bookmark }>(),
+    'Create': props<{ data: Omit<Bookmark, 'id'> }>(),
+    'Create Success': props<{ item: Bookmark }>(),
     'Create Failure': props<{ error: string }>(),
 
-    'Update': props<{ bookmark: Bookmark }>(),
-    'Update Success': props<{ bookmark: Bookmark }>(),
+    'Update': props<{ id: Bookmark['id']; changes: Partial<Bookmark> }>(),
+    'Update Success': props<{ item: Bookmark }>(),
     'Update Failure': props<{ error: string }>(),
 
-    'Delete': props<{ id: number | string }>(),
-    'Delete Success': props<{ id: number | string }>(),
+    'Delete': props<{ id: Bookmark['id'] }>(),
+    'Delete Success': props<{ id: Bookmark['id'] }>(),
     'Delete Failure': props<{ error: string }>(),
   }
 });

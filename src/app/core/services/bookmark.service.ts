@@ -1,10 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { Bookmark } from '../models/bookmark.model';
 import { environment } from '../../../environments/environment.development';
-import { catchError, map, of, switchMap, throwError } from 'rxjs';
-
 
 @Injectable({ providedIn: 'root' })
 export class BookmarkService {
@@ -12,39 +10,40 @@ export class BookmarkService {
   private base = `${environment.apiBaseUrl}/bookmarks`;
 
   list(): Observable<Bookmark[]> {
-    return this.http.get<Bookmark[]>(this.base);
+    // Let the server sort; avoids sorting in effects/components
+    return this.http.get<Bookmark[]>(`${this.base}?_sort=createdAt&_order=desc`);
   }
 
-  // src/app/core/services/bookmark.service.ts
-
-get(id: number | string) {
-  const url = `${this.base}/${id}`;
-  return this.http.get<Bookmark>(url).pipe(
-    catchError(err => {
-      // Fallback for string IDs or odd backends: try ?id=<id>
-      if (err.status === 404) {
-        return this.http.get<Bookmark[]>(`${this.base}?id=${encodeURIComponent(String(id))}`).pipe(
-          map(arr => {
-            if (arr.length > 0) return arr[0];
-            throw err;
-          })
-        );
-      }
-      return throwError(() => err);
-    })
-  );
-}
-
+  get(id: number | string): Observable<Bookmark> {
+    const url = `${this.base}/${encodeURIComponent(String(id))}`;
+    return this.http.get<Bookmark>(url).pipe(
+      catchError(err => {
+        if (err.status === 404) {
+          // Some datasets store ids as strings; this fallback handles that.
+          return this.http
+            .get<Bookmark[]>(`${this.base}?id=${encodeURIComponent(String(id))}`)
+            .pipe(
+              map(arr => {
+                if (arr.length > 0) return arr[0];
+                throw err;
+              })
+            );
+        }
+        return throwError(() => err);
+      })
+    );
+  }
 
   create(payload: Omit<Bookmark, 'id'>): Observable<Bookmark> {
     return this.http.post<Bookmark>(this.base, payload);
   }
 
-  update(payload: Bookmark): Observable<Bookmark> {
-    return this.http.put<Bookmark>(`${this.base}/${payload.id}`, payload);
+  // prefer PATCH for json-server; switch back to PUT if you send full objects
+  update(payload: Partial<Bookmark> & Pick<Bookmark, 'id'>): Observable<Bookmark> {
+    return this.http.patch<Bookmark>(`${this.base}/${encodeURIComponent(String(payload.id))}`, payload);
   }
 
   delete(id: number | string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/${id}`);
+    return this.http.delete<void>(`${this.base}/${encodeURIComponent(String(id))}`);
   }
 }
