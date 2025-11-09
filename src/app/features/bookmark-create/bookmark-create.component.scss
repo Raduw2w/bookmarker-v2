@@ -1,8 +1,68 @@
-.bookmark-create {
-  padding: 2rem;
+.bookmark-card {
+  background-color: #181818;
+  border-radius: 15px;
+  color: #e0e0e0;
+  padding: 1.5rem;
+  max-width: 520px;
+  margin: 2rem auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  display: block;
 
-  h2 {
-    margin-bottom: 2rem;
-    color: var(--text-primary);
+  mat-card-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.4rem;
+  }
+
+  mat-card-subtitle {
+    color: #a8a8a8;
+    margin-bottom: 0.5rem;
+  }
+
+  .bookmark-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  mat-form-field {
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 0.25rem;
+    }
+
+    input[matInput] {
+      color: #fff;
+    }
+
+    mat-error {
+      color: #ff6b6b;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+
+    button[mat-stroked-button] {
+      color: #d0d0d0;
+      border-color: #3a3a3a;
+
+      &:hover { border-color: #6a6a6a; }
+      &:disabled { opacity: 0.6; }
+    }
+
+    button[mat-raised-button] {
+      background-color: #1976d2;
+
+      &:hover { background-color: #1e88e5; }
+      &:disabled { background-color: #3a3a3a; color: #9a9a9a; }
+    }
   }
 }
+
+/* No skeleton here since create doesn't fetch an existing bookmark. */

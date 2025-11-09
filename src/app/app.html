@@ -1,21 +1,21 @@
-<mat-toolbar class="navbar" color="primary">
-  <a routerLink="/" class="brand" aria-label="Go to homepage">
-    <span class="title">Bookmarker</span>
-  </a>
-
-  <span class="spacer"></span>
-
-  <nav class="nav-links">
-    <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      List
+<!-- app.html -->
+@defer {
+  <mat-toolbar class="navbar">
+    <a routerLink="/" class="brand" aria-label="Go to homepage">
+      <span class="title">Bookmarker</span>
     </a>
-    <a mat-flat-button color="accent" routerLink="/create" class="new-btn">
-      <mat-icon aria-hidden="true">add</mat-icon>
-      New
-    </a>
-  </nav>
-</mat-toolbar>
+  </mat-toolbar>
 
-<main class="container">
-  <router-outlet></router-outlet>
-</main>
+  <main class="container">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <span>© 2024 Bookmarker</span>
+  </footer>
+} @loading (minimum 1s) {
+  <div class="state loading" role="status" aria-live="polite">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <span>Loading…</span>
+  </div>
+}

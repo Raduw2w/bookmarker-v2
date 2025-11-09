@@ -1,129 +1,14 @@
-// .bookmarks-card {
-//   padding: 1rem;
+/* Force mat-divider[inset] to stretch fully for horizontal list items */
+.mat-divider.mat-divider-horizontal.mat-divider-inset,
+mat-divider[inset].mat-divider-horizontal {
+  box-sizing: border-box;
+  margin-left: 0 !important;
+  width: 100% !important;
+}
 
-//   mat-card-title { font-weight: 600; }
-//   mat-card-subtitle { margin-bottom: .25rem; opacity: .8; }
-// }
-
-// /* Toolbar */
-// .toolbar {
-//   display: flex;
-//   gap: 12px;
-//   align-items: center;
-//   margin: 1rem 0;
-
-//   .new-btn {
-//     white-space: nowrap;
-//     display: inline-flex;
-//     gap: 6px;
-//     align-items: center;
-//   }
-// }
-
-// /* Groups */
-// .group {
-//   margin-top: 1.25rem;
-
-//   .group-header {
-//     display: flex;
-//     align-items: center;
-//     gap: 12px;
-//     margin: 0 0 .5rem;
-
-//     h3 {
-//       font-size: 1rem;
-//       font-weight: 600;
-//       margin: 0;
-//     }
-
-//     mat-chip-set {
-//       --mdc-chip-container-height: 24px;
-
-//       mat-chip {
-//         font-size: .75rem;
-//         opacity: .85;
-//       }
-//     }
-//   }
-// }
-
-// /* Items */
-// .bookmark-item {
-//   width: 100%;
-//   display: flex;
-//   align-items: center;
-//   padding: .25rem 0;
-
-//   .bookmark-info {
-//     display: flex;
-//     flex-direction: column;
-//     min-width: 0; // allow truncation
-
-//     .title {
-//       display: inline-flex;
-//       align-items: center;
-//       gap: 6px;
-//       font-weight: 500;
-//       text-decoration: none;
-
-//       .open-icon {
-//         font-size: 18px;
-//         height: 18px;
-//         width: 18px;
-//         opacity: .7;
-//         transition: opacity .15s ease;
-//       }
-
-//       &:hover .open-icon { opacity: 1; }
-//     }
-
-//     .url {
-//       font-size: 12px;
-//       opacity: .7;
-//       white-space: nowrap;
-//       overflow: hidden;
-//       text-overflow: ellipsis;
-//       max-width: 560px;
-
-//       @media (max-width: 768px) { max-width: 240px; }
-//     }
-//   }
-
-//   .spacer { flex: 1; }
-// }
-
-// /* States */
-// .state {
-//   display: flex;
-//   gap: 10px;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 1rem;
-//   color: rgba(0, 0, 0, .6);
-
-//   &.empty {
-//     flex-direction: column;
-//     gap: 8px;
-
-//     mat-icon {
-//       font-size: 36px;
-//       height: 36px;
-//       width: 36px;
-//       opacity: .6;
-//     }
-
-//     p { margin: 0; }
-//   }
-// }
-
-// /* Divider spacing inside lists */
-// mat-list-item + mat-list-item mat-divider[inset] {
-//   margin-left: 16px;
-// }
-
-/* === Modern Bookmarks Styles (drop-in replacement) === */
-
-
+/* =========================
+   Base / tokens (SCSS)
+   ========================= */
 :host {
   display: block;
   /* helps sticky toolbar respect parent context */
@@ -131,31 +16,37 @@
   font-family: 'Nunito', 'Roboto', Arial, sans-serif;
 }
 
-/* Design tokens (tweak as you like) */
+/* Design tokens */
 $radius: 16px;
 $radius-inner: 12px;
 $easing: cubic-bezier(.2, .8, .2, 1);
 $shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08);
 $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
 
+/* --- Optional fallbacks when color-mix is unavailable --- */
+$border-fallback: rgba(0, 0, 0, .10);
+$hover-fallback: rgba(0, 0, 0, .06);
+$primary-fallback: #6750A4;
+
+/* =========================
+   Card
+   ========================= */
 .bookmarks-card {
+  display: block;
   padding: 1rem 1rem 1.25rem;
   border-radius: $radius;
   box-shadow: $shadow;
-  border: 1px solid color-mix(in oklab, currentColor 10%, transparent);
 
-  /* Put the SOLID layer first (on top) and clip to padding-box,
-     then the GRADIENT under it clipped to border-box. */
-  background:
-    var(--mat-card-background-color, var(--mdc-elevated-card-container-color, #fff)) padding-box,
-    linear-gradient(180deg, color-mix(in oklab, currentColor 4%, transparent), transparent 32%) border-box;
+  /* fallback first */
+  border: 1px solid $border-fallback;
+  background: #181818 !important;
 
-  transition: box-shadow .24s $easing, transform .24s $easing, border-color .24s $easing;
-
-  &:hover {
-    box-shadow: $shadow-hover;
-    transform: translateY(-1px);
-    border-color: color-mix(in oklab, currentColor 14%, transparent);
+  /* then upgrade when supported */
+  @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+    border-color: color-mix(in oklab, currentColor 10%, transparent);
+    background:
+      var(--mat-card-background-color, var(--mdc-elevated-card-container-color, #fff)) padding-box,
+      linear-gradient(180deg, color-mix(in oklab, currentColor 4%, transparent), transparent 32%) border-box;
   }
 
   mat-card-title {
@@ -165,18 +56,6 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-
-    /* subtle pill accent behind title */
-    &::after {
-      content: '';
-      height: 8px;
-      width: 48px;
-      border-radius: 999px;
-      background: color-mix(in oklab, var(--mat-primary, #6750A4) 36%, transparent);
-      opacity: .25;
-      display: inline-block;
-      transform: translateY(4px);
-    }
   }
 
   mat-card-subtitle {
@@ -185,23 +64,35 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
   }
 }
 
-/* Toolbar */
+/* =========================
+   Toolbar (row by default)
+   Use .toolbar--stacked to switch to column layout
+   ========================= */
 .toolbar {
   position: sticky;
   top: 0; /* sits under app toolbar if any */
-  z-index: 1;
-  display: flex;
-  gap: 12px;
+  z-index: 999;
+  display: flex;                 /* FIX: was grid; flex works with props below */
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;               /* allows wrapping on small screens */
+  gap: 12px;
   margin: .75rem 0 1rem;
   padding: .5rem;
   border-radius: $radius-inner;
-  backdrop-filter: saturate(140%) blur(6px);
-  border: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+  background-color: rgb(0, 0, 0);
+
+  /* fallback first */
+  border: 1px solid $border-fallback;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+  backdrop-filter: saturate(140%) blur(6px);
+
+  @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+    border-color: color-mix(in oklab, currentColor 10%, transparent);
+  }
 
   /* Let search bar grow if it’s your component */
-  app-search-bar { flex: 1 1 auto; min-width: 160px; }
+  app-search-bar { flex: 1 1 160px; min-width: 160px; } /* FIX: flex now applies */
 
   .new-btn {
     white-space: nowrap;
@@ -210,19 +101,39 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
     align-items: center;
     border-radius: 999px;
     text-transform: none;
-
-    /* fun entrance & hover micro-interaction */
     animation: pop-in .28s $easing both;
     transform-origin: center;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px color-mix(in oklab, var(--mat-primary, #6750A4) 22%, transparent);
+      box-shadow: 0 6px 18px rgba($primary-fallback, .22); /* Sass color w/ alpha */
+
+      @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+        box-shadow: 0 6px 18px color-mix(in oklab, var(--mat-primary, #6750A4) 22%, transparent);
+      }
     }
+  }
+
+  /* Optional action row */
+  .toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .new-btn { margin-left: auto; }
+  }
+
+  &.toolbar--stacked {
+    flex-direction: column;      /* FIX: now affects a flex container */
+    align-items: stretch;
+    gap: 8px;
+    margin: 8px 0 12px;
   }
 }
 
-/* Groups */
+/* =========================
+   Groups
+   ========================= */
 .group {
   margin-top: 1.25rem;
   padding: .25rem 0;
@@ -233,9 +144,7 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
     gap: 10px;
     margin: 0 0 .5rem;
     padding: .25rem .25rem;
-    border-radius: 10px;
-
-    /* slide in on first paint */
+    border-radius: $radius-inner - 2px;
     animation: slide-fade-in .35s $easing both;
 
     h3 {
@@ -245,8 +154,15 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
       margin: 0;
     }
 
+    .caret {
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+    }
+
     mat-chip-set {
       --mdc-chip-container-height: 24px;
+      margin-left: auto;
 
       mat-chip {
         font-size: .75rem;
@@ -259,37 +175,54 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
   }
 }
 
-/* Items */
+/* =========================
+   Items
+   ========================= */
 .bookmark-item {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: .75rem; /* unified gap */
   padding: .375rem .25rem;
-  border-radius: 10px;
+  border-radius: $radius-inner - 2px;
   position: relative;
   transition: background .18s $easing, transform .18s $easing, box-shadow .18s $easing;
 
-  /* subtle sheen on hover like a ripple highlight */
+  /* Custom hover color */
   &:hover {
-    background: color-mix(in oklab, currentColor 6%, transparent);
+    background: #046a5c7d !important; /* 8-digit hex w/ alpha */
+    color: #fff !important;
   }
 
-  /* pressed state */
-  &:active {
-    transform: translateY(0.5px) scale(.998);
-  }
+  &:active { transform: translateY(0.5px) scale(.998); }
 
-  /* focus ring for a11y (when tabbing to buttons/links inside) */
-  &:has(a:focus-visible, button:focus-visible) {
-    outline: 3px solid color-mix(in oklab, var(--mat-primary, #6750A4) 42%, transparent);
+  /* focus ring (baseline on focusables) */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid rgba($primary-fallback, .42);
     outline-offset: 2px;
+
+    @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+      outline-color: color-mix(in oklab, var(--mat-primary, #6750A4) 42%, transparent);
+    }
+  }
+
+  /* enhanced parent highlight where supported */
+  @supports selector(:has(*)) {
+    &:has(a:focus-visible, button:focus-visible) {
+      outline: 3px solid rgba($primary-fallback, .42);
+      outline-offset: 2px;
+
+      @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+        outline-color: color-mix(in oklab, var(--mat-primary, #6750A4) 42%, transparent);
+      }
+    }
   }
 
   .bookmark-info {
     display: flex;
     flex-direction: column;
-    min-width: 0; // allow truncation
+    min-width: 0; /* allow truncation */
 
     .title {
       display: inline-flex;
@@ -320,9 +253,10 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
     }
   }
 
-  .spacer { flex: 1; }
+  .spacer { flex: 1 1 auto; }
 
-  a[mat-button], button[mat-button] {
+  a[mat-button],
+  button[mat-button] {
     border-radius: 999px;
     text-transform: none;
     height: 34px;
@@ -335,21 +269,71 @@ $shadow-hover: 0 2px 8px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.12);
   }
 
   /* subtle dividing line inside list */
-  + mat-divider[inset] {
-    margin-left: 16px;
+  + mat-divider[inset] { margin-left: 16px; }
+}
+
+/* =========================
+   List item container (Angular Material) — full fix for right-edge strip
+   ========================= */
+
+/* Host: remove host hover, clip ripple, share radius, provide var */
+mat-list-item {
+  cursor: pointer;
+  background: none !important; /* kill any host background painting */
+  border-radius: $radius-inner - 4px;
+  overflow: hidden;            /* clip ripple + hover to radius */
+  position: relative;
+
+  --_hover-bg: #00000014;
+  @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+    --_hover-bg: color-mix(in oklab, currentColor 8%, transparent);
   }
 }
 
-/* List item container hover (wraps .bookmark-item) */
-mat-list-item {
-  border-radius: 12px;
-  --_hover-bg: color-mix(in oklab, currentColor 8%, transparent);
-
-  transition: background .18s $easing;
-  &:hover { background: var(--_hover-bg); }
+/* Inner MDC element: ensure full-bleed and radius */
+mat-list-item .mat-mdc-list-item.mdc-list-item {
+  border-radius: inherit;
+  width: 100%;
+  padding-inline: 8px; /* adjust if you need tighter/looser edges */
 }
 
-/* Empty & Loading states */
+/* Paint the hover on the inner row so it covers 100% width */
+mat-list-item .mat-mdc-list-item.mdc-list-item:hover {
+  background: var(--_hover-bg);
+}
+
+/* Ripple tuning so hover overlay/ripple don’t leave artifacts */
+mat-list-item .mat-mdc-list-item {
+  --mdc-ripple-hover-opacity: 0;
+  --mdc-ripple-press-opacity: 0.10;
+}
+
+/* Optional alternative: full-bleed pseudo overlay on host
+   (uncomment if you prefer this approach instead of the inner :hover)
+   Keeps the same radius/clip.
+*/
+/*
+mat-list-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+}
+mat-list-item:hover::before {
+  background: var(--_hover-bg);
+}
+*/
+
+/* Divider spacing inside lists (unchanged) */
+mat-list-item + mat-list-item mat-divider[inset] {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* =========================
+   Empty & Loading states
+   ========================= */
 .state {
   display: flex;
   gap: 10px;
@@ -380,7 +364,13 @@ mat-list-item {
     border-radius: $radius-inner;
     position: relative;
     overflow: hidden;
-    background: color-mix(in oklab, currentColor 6%, transparent);
+
+    /* fallback bg */
+    background: $hover-fallback;
+
+    @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+      background: color-mix(in oklab, currentColor 6%, transparent);
+    }
 
     /* skeleton shimmer */
     &::before {
@@ -390,7 +380,7 @@ mat-list-item {
       background: linear-gradient(
         90deg,
         transparent 0%,
-        color-mix(in oklab, #fff 70%, transparent) 50%,
+        rgba(255,255,255,.7) 50%,
         transparent 100%
       );
       animation: shimmer 1.2s $easing infinite;
@@ -400,12 +390,9 @@ mat-list-item {
   }
 }
 
-/* Divider spacing inside lists (kept from your original) */
-mat-list-item + mat-list-item mat-divider[inset] {
-  margin-left: 16px;
-}
-
-/* --- Animations --- */
+/* =========================
+   Animations
+   ========================= */
 @keyframes slide-fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -426,39 +413,49 @@ mat-list-item + mat-list-item mat-divider[inset] {
   50%     { transform: translateY(-4px); }
 }
 
-/* --- Dark mode polish --- */
+/* =========================
+   Dark mode polish
+   ========================= */
 @media (prefers-color-scheme: dark) {
   .bookmarks-card {
-    border-color: color-mix(in oklab, currentColor 22%, transparent);
-    /* solid on TOP (padding-box), gradient UNDER (border-box) */
+    /* fallback */
+    border-color: rgba(255,255,255,.22);
     background:
       var(--mat-card-background-color, #1b1b1b) padding-box,
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, currentColor 6%, transparent),
-        transparent 32%
-      ) border-box;
+      linear-gradient(180deg, rgba(255,255,255,.06), transparent 32%) border-box;
+
+    @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+      border-color: color-mix(in oklab, currentColor 22%, transparent);
+      background:
+        var(--mat-card-background-color, #1b1b1b) padding-box,
+        linear-gradient(180deg, color-mix(in oklab, currentColor 6%, transparent), transparent 32%) border-box;
+    }
   }
 
   .toolbar {
     /* remove heavy tint; match card surface */
-    border-color: color-mix(in oklab, currentColor 22%, transparent);
+    border-color: rgba(255,255,255,.22);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-    backdrop-filter: none; /* avoid extra “fog” in dark mode */
+    backdrop-filter: none;
+
+    @supports (color: color-mix(in oklab, black 0%, white 0%)) {
+      border-color: color-mix(in oklab, currentColor 22%, transparent);
+    }
   }
 
   .state { color: rgba(255,255,255,.78); }
 }
 
-
-/* --- Respect reduced motion --- */
+/* =========================
+   Respect reduced motion
+   (only here do we disable shimmer/animations)
+   ========================= */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+
+  .state.loading {
+    background: transparent;
+
+    &::before { display: none; }
   }
 }
-
-.state.loading { background: transparent; }
-.state.loading::before { display: none; }
-

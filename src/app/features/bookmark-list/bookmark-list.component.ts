@@ -1,8 +1,8 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   Observable,
@@ -12,6 +12,7 @@ import {
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  tap,
 } from 'rxjs';
 import Fuse, { IFuseOptions } from 'fuse.js';
 
@@ -26,16 +27,16 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { SearchBarComponent } from '../../shared/components/search-bar/search-bar.component';
 import { HighlightFusePipe } from '../../shared/pipes/highlight-fuse.pipe';
 import { GroupByDatePipe } from '../../shared/pipes/group-by-date.pipe';
 import { ErrorBannerComponent } from '../../shared/components/error-banner/error-banner.component';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import {MatTooltipModule} from '@angular/material/tooltip';
 
+// ...imports omitted for brevity (same as previous version) ...
 
 @Component({
   selector: 'app-bookmark-list',
@@ -62,24 +63,18 @@ import {MatTooltipModule} from '@angular/material/tooltip';
   styleUrls: ['./bookmark-list.component.scss'],
 })
 export class BookmarkListComponent implements OnInit {
-  /** raw list from store (sorted desc by createdAt) */
+  openBookmark(b: Bookmark) {
+    window.open(b.url, '_blank', 'noopener');
+  }
+
   allBookmarks$!: Observable<Bookmark[]>;
-
-  /** filtered list by current search */
   searchBookmarks$!: Observable<Bookmark[]>;
-
-  /** alias used by the template */
   bookmarks$!: Observable<Bookmark[]>;
-
-  /** error message (template uses | async) */
   errorMsg$!: Observable<string | null>;
 
-  /** search signal (source of truth for query) */
   search = signal<string>('');
-  /** convert signal → observable for RxJS composition */
   private search$ = toObservable(this.search);
 
-  /** store Fuse match ranges for highlight pipe */
   private matchesById = new Map<string, Array<{ key: string; indices: [number, number][] }>>();
 
   private readonly fuseOptions: IFuseOptions<Bookmark> = {
@@ -95,28 +90,41 @@ export class BookmarkListComponent implements OnInit {
     ],
   };
 
+  todayCollapsed = signal(false);
+  yesterdayCollapsed = signal(false);
+  olderCollapsed = signal(false);
+
+  private destroyRef = inject(DestroyRef);
+
   constructor(private store: Store, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.store.dispatch(BookmarksActions.load());
-
     this.allBookmarks$ = this.store.select(selectAllBookmarks);
     this.errorMsg$ = this.store.select(selectError);
 
-    // Build a Fuse index whenever the list changes (shared)
     const fuse$ = this.allBookmarks$.pipe(
       map((list) => new Fuse<Bookmark>(list, this.fuseOptions)),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 
-    // Debounce search so Fuse doesn't run on every keystroke
     const query$ = this.search$.pipe(
       startWith(''),
       debounceTime(250),
       distinctUntilChanged()
     );
 
-    // Combine list + fuse + query; if empty query -> full list, else ranked results
+    // Auto-expand all when searching
+    query$
+      .pipe(
+        tap((q) => {
+          const hasQuery = !!(q ?? '').trim();
+          if (hasQuery) this.expandAll();
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
+
     this.searchBookmarks$ = combineLatest({
       list: this.allBookmarks$,
       fuse: fuse$,
@@ -149,6 +157,33 @@ export class BookmarkListComponent implements OnInit {
     this.bookmarks$ = this.searchBookmarks$;
   }
 
+  // --- Expand / Collapse controls ---
+  toggle(section: 'today' | 'yesterday' | 'older') {
+    switch (section) {
+      case 'today':
+        this.todayCollapsed.set(!this.todayCollapsed());
+        break;
+      case 'yesterday':
+        this.yesterdayCollapsed.set(!this.yesterdayCollapsed());
+        break;
+      case 'older':
+        this.olderCollapsed.set(!this.olderCollapsed());
+        break;
+    }
+  }
+
+  expandAll() {
+    this.todayCollapsed.set(false);
+    this.yesterdayCollapsed.set(false);
+    this.olderCollapsed.set(false);
+  }
+
+  collapseAll() {
+    this.todayCollapsed.set(true);
+    this.yesterdayCollapsed.set(true);
+    this.olderCollapsed.set(true);
+  }
+
   deleteBookmark(b: Bookmark) {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Delete bookmark', message: `Delete “${b.title}”?` },
@@ -158,18 +193,15 @@ export class BookmarkListComponent implements OnInit {
     });
   }
 
-  /** Called from <app-search-bar (search)="onSearch($event)"> */
   onSearch(q: string) {
     this.search.set(q ?? '');
   }
 
-  /** helper for highlight pipe */
   getMatchesFor(id: number | string, key: 'title' | 'url') {
     const m = this.matchesById.get(String(id)) ?? [];
     const found = m.find((x) => x.key === key);
     return found?.indices ?? null;
   }
 
-  /** bound to the error banner's Retry button */
   retry = () => this.store.dispatch(BookmarksActions.load());
 }

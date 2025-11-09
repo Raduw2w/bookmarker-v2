@@ -22,7 +22,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatButtonModule,
   ],
   templateUrl: './bookmark-create.component.html',
-  styles: [`.w-full{width:100%}.actions{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1rem}`],
+  styleUrls: ['./bookmark-create.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookmarkCreateComponent {

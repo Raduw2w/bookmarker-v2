@@ -1,8 +1,86 @@
-.bookmark-edit {
-  padding: 2rem;
+.bookmark-card {
+  background-color: #181818;
+  border-radius: 15px;
+  color: #e0e0e0;
+  padding: 1.5rem;
+  max-width: 520px;
+  margin: 2rem auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  display: block;
 
-  h2 {
-    margin-bottom: 2rem;
-    color: var(--text-primary);
+  mat-card-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.4rem;
+  }
+
+  mat-card-subtitle {
+    color: #a8a8a8;
+    margin-bottom: 0.5rem;
+  }
+
+  .bookmark-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  mat-form-field {
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 0.25rem;
+    }
+
+    input[matInput] {
+      color: #fff;
+    }
+
+    mat-error {
+      color: #ff6b6b;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+
+    button[mat-stroked-button] {
+      color: #d0d0d0;
+      border-color: #3a3a3a;
+
+      &:hover { border-color: #6a6a6a; }
+      &:disabled { opacity: 0.6; }
+    }
+
+    button[mat-raised-button] {
+      background-color: #1976d2;
+
+      &:hover { background-color: #1e88e5; }
+      &:disabled { background-color: #3a3a3a; color: #9a9a9a; }
+    }
+  }
+
+  /* Lightweight loading skeleton */
+  .skeleton {
+    width: 100%;
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #202020 25%, #2a2a2a 37%, #202020 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+    display: grid;
+    place-items: center;
+    color: #bdbdbd;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: 0 0; }
   }
 }
+
+/* Cleanup: no .saving-bar, no absolute progress bar rules */

@@ -2,21 +2,22 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #121212; // dark background
+  // background-color: #121212; // dark background
   color: #e0e0e0;
 }
 
 .navbar {
-  background-color: #1e1e1e !important; // override Angular Material default
+  background-color: #000000 !important; // override Angular Material default
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   padding: 0 1rem;
   display: flex;
+  justify-content: center;
   align-items: center;
 }
 
 .brand {
   text-decoration: none;
-  color: #ffffff;
+  color: #1de9b6;
   display: flex;
   align-items: center;
 }
@@ -43,24 +44,27 @@
   color: #ffffff;
 }
 
-.new-btn {
-  background-color: #00bfa5 !important; // teal accent
-  color: #ffffff !important;
-  border-radius: 8px;
-  padding: 0 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  text-transform: none;
-}
+// .new-btn {
+//   background-color: #00bfa5 !important; // teal accent
+//   color: #ffffff !important;
+//   border-radius: 8px;
+//   padding: 0 1rem;
+//   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+//   text-transform: none;
+// }
+
 
 .new-btn:hover {
   background-color: #1de9b6 !important;
 }
 
 
+
+
 .container {
   flex: 1;
   padding: 2rem;
-  background-color: #181818;
+  background-color: #000000;
   color: #e0e0e0;
 }
 

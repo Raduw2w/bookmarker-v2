@@ -1,4 +1,10 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,13 +22,17 @@ import { map, filter, take, tap } from 'rxjs';
 @Component({
   standalone: true,
   selector: 'app-bookmark-edit',
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   templateUrl: './bookmark-edit.component.html',
-  styles: [`
-    .w-full{width:100%}
-    .actions{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1rem}
-  `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./bookmark-edit.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookmarkEditComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -31,8 +41,9 @@ export class BookmarkEditComponent implements OnInit {
   private store = inject(Store);
 
   saving = signal(false);
-  id!: string;                // keep as string; reducer uses String(id) for keys
-  bookmark!: Bookmark;        // current entity (after it’s found)
+
+  id!: string;         // string key (matches entity adapter)
+  bookmark!: Bookmark; // current entity
 
   form = this.fb.group({
     title: ['', Validators.required],
@@ -45,9 +56,9 @@ export class BookmarkEditComponent implements OnInit {
       this.router.navigateByUrl('/');
       return;
     }
-    this.id = raw; // keys in entity adapter are strings
+    this.id = raw;
 
-    // Try to read from store; if missing, trigger a load (deep link support)
+    // Load from store (and request data if deep-linked)
     this.store.select(selectBookmarkEntities).pipe(
       tap(entities => {
         if (!entities || !entities[this.id]) {
@@ -55,27 +66,29 @@ export class BookmarkEditComponent implements OnInit {
         }
       }),
       map(entities => entities?.[this.id]),
-      filter((b): b is Bookmark => !!b), // wait until entity appears
+      filter((b): b is Bookmark => !!b),
       take(1)
     ).subscribe({
       next: (b) => {
         this.bookmark = b;
         this.form.reset({ title: b.title, url: b.url }, { emitEvent: false });
       },
-      error: () => this.router.navigateByUrl('/')
+      error: () => this.router.navigateByUrl('/'),
     });
   }
 
   save(): void {
     if (this.form.invalid || this.saving()) return;
-    this.saving.set(true);
 
+    this.saving.set(true);
     const { title, url } = this.form.value as { title: string; url: string };
+
     this.store.dispatch(
       BookmarksActions.update({ id: this.id, changes: { title, url } })
     );
 
-    // Simple optimistic nav; if you prefer, navigate on updateSuccess in an effect
+    // Simple optimistic nav; if you have success/failure actions,
+    // consider navigating in the effect instead.
     this.router.navigateByUrl('/');
   }
 

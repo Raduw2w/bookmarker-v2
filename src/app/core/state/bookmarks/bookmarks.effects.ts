@@ -98,7 +98,7 @@ export class BookmarksEffects {
     () =>
       this.actions$.pipe(
         ofType(BookmarksActions.deleteSuccess),
-        tap(() => this.snack.open('Bookmark deleted', undefined, { duration: 2000 }))
+        tap(() => this.snack.open('Bookmark deleted', undefined, { duration: 3000 }))
       ),
     { dispatch: false }
   );
@@ -108,8 +108,7 @@ export class BookmarksEffects {
     () =>
       this.actions$.pipe(
         ofType(BookmarksActions.createSuccess),
-        tap(() => this.snack.open('Bookmark created', undefined, { duration: 2000 })),
-        delay(1000),
+        tap(() => this.snack.open('Bookmark created', undefined, { duration: 3000 })),
         tap(() => this.router.navigateByUrl('/'))
       ),
     { dispatch: false }

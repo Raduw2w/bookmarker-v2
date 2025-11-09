@@ -1,0 +1,34 @@
+<div class="dialog-surface" role="dialog" aria-modal="true">
+  <div class="accent-bar" [class.danger]="isDanger"></div>
+
+  <div class="header">
+    <div class="icon-wrap" [class.danger]="isDanger" aria-hidden="true">
+      <mat-icon>{{ isDanger ? 'warning_amber' : 'help' }}</mat-icon>
+    </div>
+    <h2 class="title" mat-dialog-title>
+      {{ data.title || (isDanger ? 'Delete item' : 'Confirm') }}
+    </h2>
+  </div>
+
+  <div class="content" mat-dialog-content>
+    <p>{{ data.message || (isDanger ? 'This action cannot be undone.' : 'Are you sure you want to continue?') }}</p>
+    <div class="hint" *ngIf="isDanger">
+      Deleting permanently removes this item.
+    </div>
+  </div>
+
+  <div class="actions" mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="ref.close(false)">
+      {{ data.cancelText || 'Cancel' }}
+    </button>
+    <button
+      mat-raised-button
+      [class.warn]="isDanger"
+      [color]="isDanger ? 'warn' : 'primary'"
+      (click)="ref.close(true)"
+      cdkFocusInitial
+    >
+      {{ data.confirmText || (isDanger ? 'Delete' : 'Confirm') }}
+    </button>
+  </div>
+</div>
