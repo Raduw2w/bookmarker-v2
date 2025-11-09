@@ -20,7 +20,7 @@ export class BookmarksEffects {
       exhaustMap(() =>
         this.api.list().pipe(
           map(items => BookmarksActions.loadSuccess({ items })),
-          catchError(() => of(BookmarksActions.loadFailure({ error: 'Failed to load bookmarks' })))
+          catchError(() => of(BookmarksActions.loadFailure({ error: 'Failed to load bookmarks. Hint: Start JSON-Server' })))
         )
       )
     )
@@ -94,25 +94,39 @@ export class BookmarksEffects {
   );
 
   // Toast for delete success
-  deleteSuccessToast$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(BookmarksActions.deleteSuccess),
-        tap(() => this.snack.open('Bookmark deleted', undefined, { duration: 3000 }))
-      ),
-    { dispatch: false }
-  );
+ // Toast for delete success
+deleteSuccessToast$ = createEffect(
+  () =>
+    this.actions$.pipe(
+      ofType(BookmarksActions.deleteSuccess),
+      tap(() =>
+        this.snack.open('Bookmark deleted', undefined, {
+          duration: 3000,
+          panelClass: ['snack-error'] // 👈 custom class
+        })
+      )
+    ),
+  { dispatch: false }
+);
+
 
   // Create success toast + navigate
-  createSuccessNavigate$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(BookmarksActions.createSuccess),
-        tap(() => this.snack.open('Bookmark created', undefined, { duration: 3000 })),
-        tap(() => this.router.navigateByUrl('/'))
+// Create success toast + navigate
+createSuccessNavigate$ = createEffect(
+  () =>
+    this.actions$.pipe(
+      ofType(BookmarksActions.createSuccess),
+      tap(() =>
+        this.snack.open('Bookmark created', undefined, {
+          duration: 3000,
+          panelClass: ['snack-success'] // ✅ green success style
+        })
       ),
-    { dispatch: false }
-  );
+      tap(() => this.router.navigateByUrl('/'))
+    ),
+  { dispatch: false }
+);
+
 
   // Create failure toast
   createFailureToast$ = createEffect(

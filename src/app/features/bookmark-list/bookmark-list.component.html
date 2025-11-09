@@ -1,218 +1,194 @@
-<mat-card class="bookmarks-card">
-  <mat-card-subtitle>Record your bookmarks</mat-card-subtitle>
-  <mat-divider></mat-divider>
-
+<div class="container">
+  <!-- Only render when bookmarks$ emits -->
   @if (bookmarks$ | async; as bookmarks) {
-    <div class="toolbar">
-      <app-search-bar (search)="onSearch($event)"></app-search-bar>
+    <mat-card class="bookmarks-card">
 
-      <div class="toolbar-actions">
-        <button
-          mat-stroked-button
-          color="primary"
-          (click)="expandAll()"
-          matTooltip="Expand all groups"
-        >
-          <mat-icon>unfold_more</mat-icon>
-          Expand all
-        </button>
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div>
+          <app-search-bar (search)="onSearch($event)"></app-search-bar>
+          <a mat-raised-button color="primary" routerLink="/create" class="new-btn">
+            <mat-icon aria-hidden="true">add</mat-icon>
+            New
+          </a>
+        </div>
 
-        <button
-          mat-stroked-button
-          color="primary"
-          (click)="collapseAll()"
-          matTooltip="Collapse all groups"
-        >
-          <mat-icon>unfold_less</mat-icon>
-          Collapse all
-        </button>
+        <div class="toolbar-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="expandAll()"
+            matTooltip="Expand all groups"
+          >
+            <mat-icon>unfold_more</mat-icon>
+            Expand all
+          </button>
 
-        <a mat-raised-button color="primary" routerLink="/create" class="new-btn">
-          <mat-icon aria-hidden="true">add</mat-icon>
-          New
-        </a>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="collapseAll()"
+            matTooltip="Collapse all groups"
+          >
+            <mat-icon>unfold_less</mat-icon>
+            Collapse all
+          </button>
+        </div>
       </div>
-    </div>
+
+      <!-- BOOKMARKS PRESENT -->
+      @if (bookmarks && bookmarks.length > 0) {
+        @let groups = (bookmarks | groupByDate);
+
+        <!-- TODAY -->
+        <ng-container
+          *ngTemplateOutlet="
+            groupTpl;
+            context: {
+              $implicit: groups.today,
+              key: 'today',
+              title: 'Today',
+              isCollapsed: todayCollapsed()
+            }
+          "
+        ></ng-container>
+
+        <!-- YESTERDAY -->
+        <ng-container
+          *ngTemplateOutlet="
+            groupTpl;
+            context: {
+              $implicit: groups.yesterday,
+              key: 'yesterday',
+              title: 'Yesterday',
+              isCollapsed: yesterdayCollapsed()
+            }
+          "
+        ></ng-container>
+
+        <!-- OLDER -->
+        <ng-container
+          *ngTemplateOutlet="
+            groupTpl;
+            context: {
+              $implicit: groups.older,
+              key: 'older',
+              title: 'Older',
+              isCollapsed: olderCollapsed()
+            }
+          "
+        ></ng-container>
+
+        <!-- GROUP TEMPLATE -->
+        <ng-template #groupTpl let-items let-key="key" let-title="title" let-isCollapsed="isCollapsed">
+          @if (items?.length) {
+            <section class="group">
+              <header class="group-header">
+                <button
+                  mat-icon-button
+                  class="caret"
+                  (click)="toggle(key)"
+                  [attr.aria-expanded]="!isCollapsed"
+                  [attr.aria-controls]="key + '-panel'"
+                  [matTooltip]="isCollapsed ? 'Expand' : 'Collapse'"
+                  [attr.aria-label]="'Toggle ' + title + ' section'"
+                >
+                  <mat-icon>{{ isCollapsed ? 'chevron_right' : 'expand_more' }}</mat-icon>
+                </button>
+
+                <h3 id="{{ key }}-label">{{ title }}</h3>
+                <mat-chip-set aria-label="{{ title }} count">
+                  <mat-chip>{{ items.length }}</mat-chip>
+                </mat-chip-set>
+              </header>
+
+              @if (!isCollapsed) {
+                <mat-list
+                  id="{{ key }}-panel"
+                  role="group"
+                  [attr.aria-labelledby]="key + '-label'"
+                >
+                  @for (b of items; track (b?.id ?? b?.url ?? $index)) {
+                    <mat-list-item
+                      tabindex="0"
+                      (click)="openBookmark(b)"
+                      (keydown.enter)="openBookmark(b)"
+                      (keydown.space)="openBookmark(b)"
+                    >
+                      <div class="bookmark-item">
+                        <div class="bookmark-info">
+                          <span
+                            class="title"
+                            [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
+                          ></span>
+
+                          <div
+                            class="url"
+                            [title]="b.url"
+                            [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
+                          ></div>
+                        </div>
+
+                        <span class="spacer"></span>
+
+                        <!-- Edit -->
+                        <a
+                          mat-button
+                          color="primary"
+                          [routerLink]="['/edit', b.id]"
+                          (click)="$event.stopPropagation()"
+                          (keydown.enter)="$event.stopPropagation()"
+                          (keydown.space)="$event.stopPropagation()"
+                        >
+                          <mat-icon aria-hidden="true">edit</mat-icon>
+                          <span>Edit</span>
+                        </a>
+
+                        <!-- Delete -->
+                        <button
+                          mat-button
+                          type="button"
+                          color="warn"
+                          (click)="$event.stopPropagation(); deleteBookmark(b)"
+                          (keydown.enter)="$event.stopPropagation()"
+                          (keydown.space)="$event.stopPropagation()"
+                        >
+                          <mat-icon aria-hidden="true">delete</mat-icon>
+                          Delete
+                        </button>
+                      </div>
+
+                      <mat-divider inset></mat-divider>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              }
+            </section>
+          }
+        </ng-template>
+      }
+
+      <!-- EMPTY STATE -->
+      @else {
+        <div class="state empty">
+          <mat-icon>bookmark_border</mat-icon>
+          <p id="empty-msg">No bookmarks found.</p>
+          <a
+            routerLink="/create"
+            mat-raised-button
+            color="accent"
+            aria-describedby="empty-msg"
+          >
+            Create one
+          </a>
+        </div>
+      }
+
+    </mat-card>
   }
 
-  @if (bookmarks$ | async; as bookmarks) {
-    @if (bookmarks.length > 0) {
-      @let groups = (bookmarks | groupByDate);
-
-      <!-- TODAY -->
-      @if (groups.today.length) {
-        <section class="group">
-          <header class="group-header">
-            <button
-              mat-icon-button
-              class="caret"
-              (click)="toggle('today')"
-              [attr.aria-expanded]="!todayCollapsed()"
-              [matTooltip]="todayCollapsed() ? 'Expand' : 'Collapse'"
-              aria-label="Toggle Today section"
-            >
-              <mat-icon>{{ todayCollapsed() ? 'chevron_right' : 'expand_more' }}</mat-icon>
-            </button>
-
-            <h3>Today</h3>
-            <mat-chip-set><mat-chip>{{ groups.today.length }}</mat-chip></mat-chip-set>
-          </header>
-
-          @if (!todayCollapsed()) {
-            <mat-list>
-              @for (b of groups.today; track b.id) {
-                <mat-list-item (click)="openBookmark(b)">
-                  <div class="bookmark-item">
-                    <div class="bookmark-info">
-                      <span
-                        class="title"
-                        [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
-                      ></span>
-                      <div
-                        class="url"
-                        [title]="b.url"
-                        [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
-                      ></div>
-                    </div>
-                    <span class="spacer"></span>
-                    <a mat-button color="primary" [routerLink]="['/edit', b.id]" (click)="$event.stopPropagation()">
-                      <mat-icon aria-hidden="true">edit</mat-icon>
-                      <span>Edit</span>
-                    </a>
-                    <button mat-button color="warn" (click)="deleteBookmark(b); $event.stopPropagation()">
-                      <mat-icon aria-hidden="true">delete</mat-icon>
-                      Delete
-                    </button>
-                  </div>
-                  <mat-divider inset></mat-divider>
-                </mat-list-item>
-              }
-            </mat-list>
-          }
-        </section>
-      }
-
-      <!-- YESTERDAY -->
-      @if (groups.yesterday.length) {
-        <section class="group">
-          <header class="group-header">
-            <button
-              mat-icon-button
-              class="caret"
-              (click)="toggle('yesterday')"
-              [attr.aria-expanded]="!yesterdayCollapsed()"
-              [matTooltip]="yesterdayCollapsed() ? 'Expand' : 'Collapse'"
-              aria-label="Toggle Yesterday section"
-            >
-              <mat-icon>{{ yesterdayCollapsed() ? 'chevron_right' : 'expand_more' }}</mat-icon>
-            </button>
-
-            <h3>Yesterday</h3>
-            <mat-chip-set><mat-chip>{{ groups.yesterday.length }}</mat-chip></mat-chip-set>
-          </header>
-
-          @if (!yesterdayCollapsed()) {
-            <mat-list>
-              @for (b of groups.yesterday; track b.id) {
-                <mat-list-item (click)="openBookmark(b)">
-                  <div class="bookmark-item">
-                    <div class="bookmark-info">
-                      <span
-                        class="title"
-                        [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
-                      ></span>
-                      <div
-                        class="url"
-                        [title]="b.url"
-                        [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
-                      ></div>
-                    </div>
-                    <span class="spacer"></span>
-                    <a mat-button color="primary" [routerLink]="['/edit', b.id]">
-                      <mat-icon aria-hidden="true">edit</mat-icon>
-                      <span>Edit</span>
-                    </a>
-                    <button mat-button color="warn" (click)="deleteBookmark(b)">
-                      <mat-icon aria-hidden="true">delete</mat-icon>
-                      Delete
-                    </button>
-                  </div>
-                  <mat-divider inset></mat-divider>
-                </mat-list-item>
-              }
-            </mat-list>
-          }
-        </section>
-      }
-
-      <!-- OLDER -->
-      @if (groups.older.length) {
-        <section class="group">
-          <header class="group-header">
-            <button
-              mat-icon-button
-              class="caret"
-              (click)="toggle('older')"
-              [attr.aria-expanded]="!olderCollapsed()"
-              [matTooltip]="olderCollapsed() ? 'Expand' : 'Collapse'"
-              aria-label="Toggle Older section"
-            >
-              <mat-icon>{{ olderCollapsed() ? 'chevron_right' : 'expand_more' }}</mat-icon>
-            </button>
-
-            <h3>Older</h3>
-            <mat-chip-set><mat-chip>{{ groups.older.length }}</mat-chip></mat-chip-set>
-          </header>
-
-          @if (!olderCollapsed()) {
-            <mat-list>
-              @for (b of groups.older; track b.id) {
-                <mat-list-item (click)="openBookmark(b)">
-                  <div class="bookmark-item">
-                    <div class="bookmark-info">
-                      <span
-                        class="title"
-                        [innerHTML]="b.title | highlightFuse : getMatchesFor(b.id, 'title')"
-                      ></span>
-                      <div
-                        class="url"
-                        [title]="b.url"
-                        [innerHTML]="b.url | highlightFuse : getMatchesFor(b.id, 'url')"
-                      ></div>
-                    </div>
-                    <span class="spacer"></span>
-                    <a mat-button color="primary" [routerLink]="['/edit', b.id]">
-                      <mat-icon aria-hidden="true">edit</mat-icon>
-                      <span>Edit</span>
-                    </a>
-                    <button mat-button color="warn" (click)="deleteBookmark(b)">
-                      <mat-icon aria-hidden="true">delete</mat-icon>
-                      Delete
-                    </button>
-                  </div>
-                  <mat-divider inset></mat-divider>
-                </mat-list-item>
-              }
-            </mat-list>
-          }
-        </section>
-      }
-    } @else {
-      <div class="state empty">
-        <mat-icon>bookmark_border</mat-icon>
-        <p>No bookmarks found.</p>
-        <a routerLink="/create" mat-raised-button color="accent">Create one</a>
-      </div>
-    }
-  } @else {
-    <!-- Loading state -->
-    <div class="state loading" role="status" aria-live="polite">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      <span>Loading bookmarks…</span>
-    </div>
-  }
-
+  <!-- ERROR BANNER (always visible if error) -->
   @if (errorMsg$ | async; as msg) {
     <app-error-banner [message]="msg" [retry]="retry"></app-error-banner>
   }
-</mat-card>
+</div>

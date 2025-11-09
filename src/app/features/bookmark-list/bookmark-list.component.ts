@@ -69,7 +69,7 @@ export class BookmarkListComponent implements OnInit {
 
   allBookmarks$!: Observable<Bookmark[]>;
   searchBookmarks$!: Observable<Bookmark[]>;
-  bookmarks$!: Observable<Bookmark[]>;
+  bookmarks$!: Observable<Bookmark[] | null>;
   errorMsg$!: Observable<string | null>;
 
   search = signal<string>('');
@@ -154,7 +154,9 @@ export class BookmarkListComponent implements OnInit {
       })
     );
 
-    this.bookmarks$ = this.searchBookmarks$;
+   this.bookmarks$ = this.searchBookmarks$.pipe(
+    startWith(null) // <- important: prevent initial flash
+  );
   }
 
   // --- Expand / Collapse controls ---

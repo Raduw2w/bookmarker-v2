@@ -1,14 +1,104 @@
-
-// .mat-tooltip {
-//   color: #fff !important;
-// }
-// Edit and Delete button text color on hover
+/* =========================
+   Button hover colors
+   ========================= */
 a[mat-button]:hover,
 button[mat-button]:hover {
-  color: #00bfa5 !important;
+  color: #00bfa5 !important; /* teal accent */
 }
 
-a[mat-button][color="warn"]:hover,
-button[mat-button][color="warn"]:hover {
-  color: #ff5252 !important;
+a[mat-button][color='warn']:hover,
+button[mat-button][color='warn']:hover {
+  color: #ff5252 !important; /* red accent */
+}
+
+/* =========================
+   Global snackbar styles
+   ========================= */
+
+/* Shared animation */
+@keyframes snack-fade {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Base snackbar container (applies to all) */
+mat-snack-bar-container.mdc-snackbar {
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 8px !important;
+}
+
+/* Common label layout (centers content) */
+::ng-deep .mat-mdc-snack-bar-label.mdc-snackbar__label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center;
+  width: 100%;
+}
+
+/* =========================
+   Success snackbar
+   ========================= */
+.snack-success {
+  background-color: #2e7d32a0 !important; /* ✅ Material green 800 w/ alpha */
+  color: #fff !important;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem !important;
+  min-height: 48px;
+  animation: snack-fade 0.25s ease-out;
+
+  .mat-mdc-snack-bar-label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .mat-mdc-button {
+    color: #fff !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* =========================
+   Error / Delete snackbar
+   ========================= */
+.snack-error {
+  background-color: #b71c1c !important; /* deep red */
+  color: #fff !important;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem !important;
+  min-height: 48px;
+  animation: snack-fade 0.25s ease-out;
+
+  .mat-mdc-snack-bar-label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .mat-mdc-button {
+    color: #fff !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
