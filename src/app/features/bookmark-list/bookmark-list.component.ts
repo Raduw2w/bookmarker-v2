@@ -35,6 +35,7 @@ import { HighlightFusePipe } from '../../shared/pipes/highlight-fuse.pipe';
 import { GroupByDatePipe } from '../../shared/pipes/group-by-date.pipe';
 import { ErrorBannerComponent } from '../../shared/components/error-banner/error-banner.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { NgZone } from '@angular/core';
 
 // ...imports omitted for brevity (same as previous version) ...
 
@@ -96,17 +97,20 @@ export class BookmarkListComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private store: Store, private dialog: MatDialog) {}
+  constructor(private store: Store, private dialog: MatDialog, private zone: NgZone) {}
 
   ngOnInit(): void {
+    console.log('BookmarkListComponent initialized');
     this.store.dispatch(BookmarksActions.load());
     this.allBookmarks$ = this.store.select(selectAllBookmarks);
     this.errorMsg$ = this.store.select(selectError);
 
-    const fuse$ = this.allBookmarks$.pipe(
-      map((list) => new Fuse<Bookmark>(list, this.fuseOptions)),
-      shareReplay({ bufferSize: 1, refCount: true })
-    );
+  const fuse$ = this.allBookmarks$.pipe(
+    map(list => this.zone.runOutsideAngular(() => new Fuse(list, this.fuseOptions))),
+    shareReplay({ bufferSize: 1, refCount: false })
+  );
+
+
 
     const query$ = this.search$.pipe(
       startWith(''),

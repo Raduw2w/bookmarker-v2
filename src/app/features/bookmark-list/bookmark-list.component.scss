@@ -184,7 +184,6 @@ $primary-fallback: #6750A4;
   align-items: center;
   gap: .75rem; /* unified gap */
   padding: .375rem .25rem;
-  border-radius: $radius-inner - 2px;
   position: relative;
   transition: background .18s $easing, transform .18s $easing, box-shadow .18s $easing;
 
