@@ -40,6 +40,69 @@
       @if (bookmarks && bookmarks.length > 0) {
         @let groups = (bookmarks | groupByDate);
 
+        <!-- BEST MATCH SECTION (only shown when searching) -->
+        @if (bestMatch$ | async; as bestMatch) {
+          <section class="best-match-section">
+            <header class="best-match-header">
+              <mat-icon class="star-icon">star</mat-icon>
+              <h3>Best Match</h3>
+            </header>
+            
+            <mat-list class="best-match-list">
+              <mat-list-item
+                class="best-match-item"
+                tabindex="0"
+                (click)="openBookmark(bestMatch)"
+                (keydown.enter)="openBookmark(bestMatch)"
+                (keydown.space)="openBookmark(bestMatch)"
+              >
+                <div class="bookmark-item">
+                  <div class="bookmark-info">
+                    <span
+                      class="title"
+                      [innerHTML]="bestMatch.title | highlightFuse : getMatchesFor(bestMatch.id, 'title')"
+                    ></span>
+
+                    <div
+                      class="url"
+                      [title]="bestMatch.url"
+                      [innerHTML]="bestMatch.url | highlightFuse : getMatchesFor(bestMatch.id, 'url')"
+                    ></div>
+                  </div>
+
+                  <span class="spacer"></span>
+
+                  <!-- Edit -->
+                  <a
+                    mat-button
+                    color="primary"
+                    [routerLink]="['/edit', bestMatch.id]"
+                    (click)="$event.stopPropagation()"
+                    (keydown.enter)="$event.stopPropagation()"
+                    (keydown.space)="$event.stopPropagation()"
+                  >
+                    <mat-icon aria-hidden="true">edit</mat-icon>
+                    <span>Edit</span>
+                  </a>
+
+                  <!-- Delete -->
+                  <button
+                    mat-button
+                    type="button"
+                    color="warn"
+                    (click)="$event.stopPropagation(); deleteBookmark(bestMatch)"
+                    (keydown.enter)="$event.stopPropagation()"
+                    (keydown.space)="$event.stopPropagation()"
+                  >
+                    <mat-icon aria-hidden="true">delete</mat-icon>
+                    Delete
+                  </button>
+                </div>
+              </mat-list-item>
+            </mat-list>
+          </section>
+        }
+
         <!-- TODAY -->
         <ng-container
           *ngTemplateOutlet="

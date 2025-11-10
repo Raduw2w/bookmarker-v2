@@ -134,6 +134,54 @@ $primary-fallback: #6750A4;
 /* =========================
    Groups
    ========================= */
+.best-match-section {
+  margin: .75rem 0 1.5rem;
+  padding: 1rem;
+  border-radius: $radius-inner;
+  background: linear-gradient(135deg, rgba(29, 233, 182, 0.15), rgba(0, 191, 165, 0.10));
+  border: 2px solid rgba(29, 233, 182, 0.4);
+  box-shadow: 0 4px 12px rgba(29, 233, 182, 0.15);
+  animation: best-match-glow .8s $easing both;
+
+  .best-match-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: .75rem;
+
+    .star-icon {
+      color: #ffc107;
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+      animation: star-pulse 2s ease-in-out infinite;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin: 0;
+      color: #1de9b6;
+    }
+  }
+
+  .best-match-list {
+    padding: 0;
+
+    .best-match-item {
+      border-radius: $radius-inner - 2px;
+      background: rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background: rgba(29, 233, 182, 0.2) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
 .group {
   margin-top: 1.25rem;
   padding: .25rem 0;
@@ -392,6 +440,28 @@ mat-list-item + mat-list-item mat-divider[inset] {
 /* =========================
    Animations
    ========================= */
+@keyframes best-match-glow {
+  from { 
+    opacity: 0; 
+    transform: translateY(-8px) scale(0.98);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes star-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(255, 193, 7, 0.5));
+  }
+  50% { 
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.8));
+  }
+}
+
 @keyframes slide-fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }

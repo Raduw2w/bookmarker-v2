@@ -71,12 +71,14 @@ export class BookmarkListComponent implements OnInit {
   allBookmarks$!: Observable<Bookmark[]>;
   searchBookmarks$!: Observable<Bookmark[]>;
   bookmarks$!: Observable<Bookmark[] | null>;
+  bestMatch$!: Observable<Bookmark | null>;
   errorMsg$!: Observable<string | null>;
 
   search = signal<string>('');
   private search$ = toObservable(this.search);
 
   private matchesById = new Map<string, Array<{ key: string; indices: [number, number][] }>>();
+  private scoresById = new Map<string, number>();
 
   private readonly fuseOptions: IFuseOptions<Bookmark> = {
     includeScore: true,
@@ -138,14 +140,25 @@ export class BookmarkListComponent implements OnInit {
         const query = (q ?? '').trim();
         if (!query) {
           this.matchesById.clear();
+          this.scoresById.clear();
           return list;
         }
         const results = fuse.search(query);
         const mapMatches = new Map<string, Array<{ key: string; indices: [number, number][] }>>();
+        const mapScores = new Map<string, number>();
+        
         for (const r of results) {
+          const itemId = String(r.item.id);
+          
+          // Store score
+          if (r.score !== undefined) {
+            mapScores.set(itemId, r.score);
+          }
+          
+          // Store matches
           if (r.matches?.length) {
             mapMatches.set(
-              String(r.item.id),
+              itemId,
               r.matches.map((m) => ({
                 key: String(m.key),
                 indices: m.indices as [number, number][],
@@ -154,7 +167,25 @@ export class BookmarkListComponent implements OnInit {
           }
         }
         this.matchesById = mapMatches;
+        this.scoresById = mapScores;
         return results.map((r) => r.item);
+      })
+    );
+
+    // Best match observable - only when searching
+    this.bestMatch$ = combineLatest({
+      list: this.allBookmarks$,
+      fuse: fuse$,
+      q: query$,
+    }).pipe(
+      map(({ list, fuse, q }) => {
+        const query = (q ?? '').trim();
+        if (!query) {
+          return null;
+        }
+        const results = fuse.search(query);
+        // Return the first result (lowest score = best match)
+        return results.length > 0 ? results[0].item : null;
       })
     );
 
