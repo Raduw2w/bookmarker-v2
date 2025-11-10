@@ -3,7 +3,7 @@
 
   <div class="header">
     <div class="icon-wrap" [class.danger]="isDanger" aria-hidden="true">
-      <mat-icon>{{ isDanger ? 'warning_amber' : 'help' }}</mat-icon>
+      <mat-icon>{{ isDanger ? 'delete' : 'delete_outline' }}</mat-icon>
     </div>
     <h2 class="title" mat-dialog-title>
       {{ data.title || (isDanger ? 'Delete item' : 'Confirm') }}
