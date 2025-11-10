@@ -73,6 +73,7 @@ export class BookmarkListComponent implements OnInit {
   bookmarks$!: Observable<Bookmark[] | null>;
   bestMatch$!: Observable<Bookmark | null>;
   errorMsg$!: Observable<string | null>;
+  isLoading = signal<boolean>(true);
 
   search = signal<string>('');
   private search$ = toObservable(this.search);
@@ -103,6 +104,7 @@ export class BookmarkListComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('BookmarkListComponent initialized');
+    
     this.store.dispatch(BookmarksActions.load());
     this.allBookmarks$ = this.store.select(selectAllBookmarks);
     this.errorMsg$ = this.store.select(selectError);
@@ -190,7 +192,13 @@ export class BookmarkListComponent implements OnInit {
     );
 
    this.bookmarks$ = this.searchBookmarks$.pipe(
-    startWith(null) // <- important: prevent initial flash
+    startWith(null), // <- important: prevent initial flash
+    tap((bookmarks) => {
+      // Hide loading indicator once data is loaded
+      if (bookmarks !== null) {
+        this.isLoading.set(false);
+      }
+    })
   );
   }
 

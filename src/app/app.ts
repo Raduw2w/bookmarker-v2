@@ -4,7 +4,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatProgressBarModule } from '@angular/material/progress-bar'; 
 
 @Component({
   selector: 'app-root',
@@ -15,8 +14,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatSnackBarModule,
-    MatProgressBarModule,
+    MatSnackBarModule
   ],
   templateUrl: 'app.html',
   styleUrls: ['app.scss'],

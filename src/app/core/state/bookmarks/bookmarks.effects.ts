@@ -78,7 +78,7 @@ export class BookmarksEffects {
     () =>
       this.actions$.pipe(
         ofType(BookmarksActions.updateSuccess),
-        tap(() => this.snack.open('Bookmark updated', undefined, { duration: 2000 }))
+        tap(() => this.snack.open('Bookmark updated', undefined, { duration: 2000,   panelClass: ['snack-success']  }))
       ),
     { dispatch: false }
   );

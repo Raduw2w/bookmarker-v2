@@ -1,5 +1,4 @@
 <!-- app.html -->
-@defer {
   <mat-toolbar class="navbar">
     <a routerLink="/" class="brand" aria-label="Go to homepage">
       <span class="title">Bookmarker</span>
@@ -13,9 +12,3 @@
   <footer class="footer">
     <span>© 2025 Bookmarker</span>
   </footer>
-} @loading (minimum 1s) {
-  <div class="state-loading" role="status" aria-live="polite">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <span>Loading…</span>
-  </div>
-}

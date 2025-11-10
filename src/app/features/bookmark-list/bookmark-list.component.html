@@ -1,4 +1,12 @@
 <div class="container">
+  <!-- Loading Progress Bar (outside main content) -->
+  @if (isLoading()) {
+    <div class="state-loading" >
+    <span>Loading…</span>
+    <mat-progress-bar mode="indeterminate" class="bookmarks-progress-standalone"></mat-progress-bar>
+    </div>
+  }
+  
   <!-- Only render when bookmarks$ emits -->
   @if (bookmarks$ | async; as bookmarks) {
     <mat-card class="bookmarks-card">
