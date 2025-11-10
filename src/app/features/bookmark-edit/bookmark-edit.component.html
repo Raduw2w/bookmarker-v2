@@ -5,67 +5,49 @@
   </mat-card-header>
 
   <mat-card-content>
-    @let titleCtrl = form.controls.title;
-    @let urlCtrl = form.controls.url;
+    @let titleCtrl = form.controls.title; @let urlCtrl = form.controls.url; @if (!bookmark) {
+    <div class="skeleton" aria-live="polite" aria-busy="true">Loading bookmark…</div>
+    } @if (bookmark) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="save()"
+      class="bookmark-form"
+      autocomplete="off"
+      novalidate
+    >
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" required />
+        @if (titleCtrl.touched && titleCtrl.hasError('required')) {
+        <mat-error>Title is required</mat-error>
+        }
+      </mat-form-field>
 
-    @if (!bookmark) {
-      <div class="skeleton" aria-live="polite" aria-busy="true">
-        Loading bookmark…
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>URL</mat-label>
+        <input matInput formControlName="url" required placeholder="https://example.com" />
+        @if (urlCtrl.touched && urlCtrl.hasError('required')) {
+        <mat-error>URL is required</mat-error>
+        } @if (urlCtrl.touched && urlCtrl.hasError('pattern')) {
+        <mat-error>Enter a valid URL (http(s)://…)</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="cancel()" [disabled]="saving()">
+          Cancel
+        </button>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="form.invalid || saving()"
+        >
+          @if (saving()) { Saving… } @else { Save }
+        </button>
       </div>
-    }
-
-    @if (bookmark) {
-      <form
-        [formGroup]="form"
-        (ngSubmit)="save()"
-        class="bookmark-form"
-        autocomplete="off"
-        novalidate
-      >
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Title</mat-label>
-          <input matInput formControlName="title" required />
-          @if (titleCtrl.touched && titleCtrl.hasError('required')) {
-            <mat-error>Title is required</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>URL</mat-label>
-          <input
-            matInput
-            formControlName="url"
-            required
-            placeholder="https://example.com"
-          />
-          @if (urlCtrl.touched && urlCtrl.hasError('required')) {
-            <mat-error>URL is required</mat-error>
-          }
-          @if (urlCtrl.touched && urlCtrl.hasError('pattern')) {
-            <mat-error>Enter a valid URL (http(s)://…)</mat-error>
-          }
-        </mat-form-field>
-
-        <div class="actions">
-          <button
-            mat-stroked-button
-            type="button"
-            (click)="cancel()"
-            [disabled]="saving()"
-          >
-            Cancel
-          </button>
-
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="form.invalid || saving()"
-          >
-            @if (saving()) { Saving… } @else { Save }
-          </button>
-        </div>
-      </form>
+    </form>
     }
   </mat-card-content>
 </mat-card>

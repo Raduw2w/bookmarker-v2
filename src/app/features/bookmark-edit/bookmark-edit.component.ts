@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,8 +36,8 @@ export class BookmarkEditComponent implements OnInit {
 
   saving = signal(false);
 
-  id!: string;         // string key (matches entity adapter)
-  bookmark!: Bookmark; // current entity
+  id!: string;
+  bookmark!: Bookmark;
 
   form = this.fb.group({
     title: ['', Validators.required],
@@ -58,23 +52,25 @@ export class BookmarkEditComponent implements OnInit {
     }
     this.id = raw;
 
-    // Load from store (and request data if deep-linked)
-    this.store.select(selectBookmarkEntities).pipe(
-      tap(entities => {
-        if (!entities || !entities[this.id]) {
-          this.store.dispatch(BookmarksActions.load());
-        }
-      }),
-      map(entities => entities?.[this.id]),
-      filter((b): b is Bookmark => !!b),
-      take(1)
-    ).subscribe({
-      next: (b) => {
-        this.bookmark = b;
-        this.form.reset({ title: b.title, url: b.url }, { emitEvent: false });
-      },
-      error: () => this.router.navigateByUrl('/'),
-    });
+    this.store
+      .select(selectBookmarkEntities)
+      .pipe(
+        tap((entities) => {
+          if (!entities || !entities[this.id]) {
+            this.store.dispatch(BookmarksActions.load());
+          }
+        }),
+        map((entities) => entities?.[this.id]),
+        filter((b): b is Bookmark => !!b),
+        take(1)
+      )
+      .subscribe({
+        next: (b) => {
+          this.bookmark = b;
+          this.form.reset({ title: b.title, url: b.url }, { emitEvent: false });
+        },
+        error: () => this.router.navigateByUrl('/'),
+      });
   }
 
   save(): void {
@@ -83,12 +79,8 @@ export class BookmarkEditComponent implements OnInit {
     this.saving.set(true);
     const { title, url } = this.form.value as { title: string; url: string };
 
-    this.store.dispatch(
-      BookmarksActions.update({ id: this.id, changes: { title, url } })
-    );
+    this.store.dispatch(BookmarksActions.update({ id: this.id, changes: { title, url } }));
 
-    // Simple optimistic nav; if you have success/failure actions,
-    // consider navigating in the effect instead.
     this.router.navigateByUrl('/');
   }
 

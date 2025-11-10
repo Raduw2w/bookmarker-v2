@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { BookmarksActions } from './bookmarks.actions';
 import { BookmarkService } from '../../services/bookmark.service';
-import { catchError, map, of, tap, delay, exhaustMap, concatMap } from 'rxjs';
+import { catchError, map, of, tap, exhaustMap, concatMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -73,59 +73,49 @@ export class BookmarksEffects {
 
   /** --- UX / Feedback Effects --- */
 
-  // ✅ Toast for successful update
+  // Toast for successful update
   updateSuccessToast$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(BookmarksActions.updateSuccess),
-        tap(() => this.snack.open('Bookmark updated', undefined, { duration: 2000,   panelClass: ['snack-success']  }))
-      ),
-    { dispatch: false }
-  );
-
-  // ✅ Navigate back after successful update
-  updateSuccessNavigate$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(BookmarksActions.updateSuccess),
-        tap(() => this.router.navigateByUrl('/'))
+        tap(() => this.snack.open('Bookmark updated', undefined, { 
+          duration: 2000, 
+          panelClass: ['snack-success'] 
+        }))
       ),
     { dispatch: false }
   );
 
   // Toast for delete success
- // Toast for delete success
-deleteSuccessToast$ = createEffect(
-  () =>
-    this.actions$.pipe(
-      ofType(BookmarksActions.deleteSuccess),
-      tap(() =>
-        this.snack.open('Bookmark deleted', undefined, {
-          duration: 3000,
-          panelClass: ['snack-error'] // 👈 custom class
-        })
-      )
-    ),
-  { dispatch: false }
-);
-
+  deleteSuccessToast$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BookmarksActions.deleteSuccess),
+        tap(() =>
+          this.snack.open('Bookmark deleted', undefined, {
+            duration: 3000,
+            panelClass: ['snack-error']
+          })
+        )
+      ),
+    { dispatch: false }
+  );
 
   // Create success toast + navigate
-// Create success toast + navigate
-createSuccessNavigate$ = createEffect(
-  () =>
-    this.actions$.pipe(
-      ofType(BookmarksActions.createSuccess),
-      tap(() =>
-        this.snack.open('Bookmark created', undefined, {
-          duration: 3000,
-          panelClass: ['snack-success'] // ✅ green success style
-        })
+  createSuccessNavigate$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BookmarksActions.createSuccess),
+        tap(() =>
+          this.snack.open('Bookmark created', undefined, {
+            duration: 3000,
+            panelClass: ['snack-success']
+          })
+        ),
+        tap(() => this.router.navigateByUrl('/'))
       ),
-      tap(() => this.router.navigateByUrl('/'))
-    ),
-  { dispatch: false }
-);
+    { dispatch: false }
+  );
 
 
   // Create failure toast
@@ -133,19 +123,55 @@ createSuccessNavigate$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(BookmarksActions.createFailure),
-        tap(({ error }) => {
-          this.snack.open(error || 'Create failed', undefined, { duration: 2500 });
-        })
+        tap(({ error }) => 
+          this.snack.open(error || 'Create failed', undefined, { 
+            duration: 2500 
+          })
+        )
       ),
     { dispatch: false }
   );
 
-  // Optional: toast for load failure
+  // Load failure toast
   loadFailureToast$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(BookmarksActions.loadFailure),
-        tap(({ error }) => this.snack.open(error, undefined, { duration: 2500 }))
+        tap(({ error }) => 
+          this.snack.open(error, undefined, { 
+            duration: 2500 
+          })
+        )
+      ),
+    { dispatch: false }
+  );
+
+  // Update failure toast
+  updateFailureToast$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BookmarksActions.updateFailure),
+        tap(({ error }) => 
+          this.snack.open(error, undefined, { 
+            duration: 3000,
+            panelClass: ['snack-error'] 
+          })
+        )
+      ),
+    { dispatch: false }
+  );
+
+  // Delete failure toast
+  deleteFailureToast$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BookmarksActions.deleteFailure),
+        tap(({ error }) => 
+          this.snack.open(error, undefined, { 
+            duration: 3000,
+            panelClass: ['snack-error'] 
+          })
+        )
       ),
     { dispatch: false }
   );

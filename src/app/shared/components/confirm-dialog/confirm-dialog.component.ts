@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,13 +10,13 @@ export interface ConfirmDialogData {
   message?: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: ConfirmVariant; // 'default' | 'danger'
+  variant?: ConfirmVariant;
 }
 
 @Component({
   standalone: true,
   selector: 'app-confirm-dialog',
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  imports: [MatDialogModule, MatButtonModule, MatIconModule],
   styleUrls: ['./confirm-dialog.component.scss'],
   templateUrl: './confirm-dialog.component.html'
 })

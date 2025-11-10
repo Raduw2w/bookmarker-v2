@@ -1,4 +1,11 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy, DestroyRef, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+  DestroyRef,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -35,9 +42,6 @@ import { HighlightFusePipe } from '../../shared/pipes/highlight-fuse.pipe';
 import { GroupByDatePipe } from '../../shared/pipes/group-by-date.pipe';
 import { ErrorBannerComponent } from '../../shared/components/error-banner/error-banner.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import { NgZone } from '@angular/core';
-
-// ...imports omitted for brevity (same as previous version) ...
 
 @Component({
   selector: 'app-bookmark-list',
@@ -79,7 +83,6 @@ export class BookmarkListComponent implements OnInit {
   private search$ = toObservable(this.search);
 
   private matchesById = new Map<string, Array<{ key: string; indices: [number, number][] }>>();
-  private scoresById = new Map<string, number>();
 
   private readonly fuseOptions: IFuseOptions<Bookmark> = {
     includeScore: true,
@@ -100,27 +103,19 @@ export class BookmarkListComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private store: Store, private dialog: MatDialog, private zone: NgZone) {}
+  constructor(private store: Store, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    console.log('BookmarkListComponent initialized');
-    
     this.store.dispatch(BookmarksActions.load());
     this.allBookmarks$ = this.store.select(selectAllBookmarks);
     this.errorMsg$ = this.store.select(selectError);
 
-  const fuse$ = this.allBookmarks$.pipe(
-    map(list => this.zone.runOutsideAngular(() => new Fuse(list, this.fuseOptions))),
-    shareReplay({ bufferSize: 1, refCount: false })
-  );
-
-
-
-    const query$ = this.search$.pipe(
-      startWith(''),
-      debounceTime(250),
-      distinctUntilChanged()
+    const fuse$ = this.allBookmarks$.pipe(
+      map((list) => new Fuse(list, this.fuseOptions)),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+
+    const query$ = this.search$.pipe(startWith(''), debounceTime(250), distinctUntilChanged());
 
     // Auto-expand all when searching
     query$
@@ -142,22 +137,15 @@ export class BookmarkListComponent implements OnInit {
         const query = (q ?? '').trim();
         if (!query) {
           this.matchesById.clear();
-          this.scoresById.clear();
           return list;
         }
         const results = fuse.search(query);
         const mapMatches = new Map<string, Array<{ key: string; indices: [number, number][] }>>();
-        const mapScores = new Map<string, number>();
-        
+
         for (const r of results) {
           const itemId = String(r.item.id);
-          
-          // Store score
-          if (r.score !== undefined) {
-            mapScores.set(itemId, r.score);
-          }
-          
-          // Store matches
+
+          // Store matches for highlighting
           if (r.matches?.length) {
             mapMatches.set(
               itemId,
@@ -169,7 +157,6 @@ export class BookmarkListComponent implements OnInit {
           }
         }
         this.matchesById = mapMatches;
-        this.scoresById = mapScores;
         return results.map((r) => r.item);
       })
     );
@@ -191,15 +178,14 @@ export class BookmarkListComponent implements OnInit {
       })
     );
 
-   this.bookmarks$ = this.searchBookmarks$.pipe(
-    startWith(null), // <- important: prevent initial flash
-    tap((bookmarks) => {
-      // Hide loading indicator once data is loaded
-      if (bookmarks !== null) {
-        this.isLoading.set(false);
-      }
-    })
-  );
+    this.bookmarks$ = this.searchBookmarks$.pipe(
+      startWith(null),
+      tap((bookmarks) => {
+        if (bookmarks !== null) {
+          this.isLoading.set(false);
+        }
+      })
+    );
   }
 
   // --- Expand / Collapse controls ---

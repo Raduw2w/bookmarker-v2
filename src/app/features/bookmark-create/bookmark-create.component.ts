@@ -45,7 +45,6 @@ export class BookmarkCreateComponent {
     // no need to handle success—effect navigates away
   }
 
- // unchanged except: no router.navigate here; effects handle it
 save(): void {
   if (this.form.invalid || this.saving()) return;
   this.saving.set(true);
@@ -54,7 +53,6 @@ save(): void {
   const createdAt = new Date().toISOString();
   this.store.dispatch(BookmarksActions.create({ data: { title, url, createdAt } }));
 }
-
 
   cancel(): void {
     // user canceled; no saving state involved

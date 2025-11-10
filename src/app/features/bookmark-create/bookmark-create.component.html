@@ -5,8 +5,7 @@
   </mat-card-header>
 
   <mat-card-content>
-    @let titleCtrl = form.controls.title;
-    @let urlCtrl = form.controls.url;
+    @let titleCtrl = form.controls.title; @let urlCtrl = form.controls.url;
 
     <form
       [formGroup]="form"
@@ -19,33 +18,22 @@
         <mat-label>Title</mat-label>
         <input matInput formControlName="title" required />
         @if (titleCtrl.touched && titleCtrl.hasError('required')) {
-          <mat-error>Title is required</mat-error>
+        <mat-error>Title is required</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>URL</mat-label>
-        <input
-          matInput
-          formControlName="url"
-          required
-          placeholder="https://example.com"
-        />
+        <input matInput formControlName="url" required placeholder="https://example.com" />
         @if (urlCtrl.touched && urlCtrl.hasError('required')) {
-          <mat-error>URL is required</mat-error>
-        }
-        @if (urlCtrl.touched && urlCtrl.hasError('pattern')) {
-          <mat-error>Enter a valid URL (http(s)://…)</mat-error>
+        <mat-error>URL is required</mat-error>
+        } @if (urlCtrl.touched && urlCtrl.hasError('pattern')) {
+        <mat-error>Enter a valid URL (http(s)://…)</mat-error>
         }
       </mat-form-field>
 
       <div class="actions">
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="cancel()"
-          [disabled]="saving()"
-        >
+        <button mat-stroked-button type="button" (click)="cancel()" [disabled]="saving()">
           Cancel
         </button>
 

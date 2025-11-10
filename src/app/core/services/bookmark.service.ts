@@ -19,7 +19,6 @@ export class BookmarkService {
     return this.http.get<Bookmark>(url).pipe(
       catchError(err => {
         if (err.status === 404) {
-          // Some datasets store ids as strings; this fallback handles that.
           return this.http
             .get<Bookmark[]>(`${this.base}?id=${encodeURIComponent(String(id))}`)
             .pipe(
@@ -38,7 +37,6 @@ export class BookmarkService {
     return this.http.post<Bookmark>(this.base, payload);
   }
 
-  // prefer PATCH for json-server; switch back to PUT if you send full objects
   update(payload: Partial<Bookmark> & Pick<Bookmark, 'id'>): Observable<Bookmark> {
     return this.http.patch<Bookmark>(`${this.base}/${encodeURIComponent(String(payload.id))}`, payload);
   }
