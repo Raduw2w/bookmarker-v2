@@ -1,5 +1,5 @@
   <div class="error-banner">
-      <mat-icon>error_outline</mat-icon>
-      <div class="msg">{{ message || 'Something went wrong.' }}</div>
-      <button mat-stroked-button color="primary" (click)="retry?.()">Retry</button>
-    </div>
+  <mat-icon>error_outline</mat-icon>
+  <div class="msg">{{ message() || 'Something went wrong.' }}</div>
+  <button mat-stroked-button color="primary" (click)="retry()?.()">Retry</button>
+</div>

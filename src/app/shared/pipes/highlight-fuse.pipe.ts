@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Pipe({
@@ -7,7 +7,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   pure: true,
 })
 export class HighlightFusePipe implements PipeTransform {
-  constructor(private san: DomSanitizer) {}
+  private san = inject(DomSanitizer);
 
   transform(text: string | null | undefined, indices: [number, number][] | null): SafeHtml {
     const s = (text ?? '').toString();

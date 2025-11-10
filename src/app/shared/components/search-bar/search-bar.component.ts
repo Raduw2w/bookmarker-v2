@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,13 +11,12 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule],
   templateUrl: './search-bar.component.html',
   styles: [`.full{width:100%;}`]
 })
 export class SearchBarComponent {
-  // ✅ Explicitly name the output "search"
-  @Output() search = new EventEmitter<string>();
+  search = output<string>();
 
   q = new FormControl<string>('', { nonNullable: true });
 
@@ -28,7 +27,6 @@ export class SearchBarComponent {
       distinctUntilChanged(),
       debounceTime(200),
     ).subscribe(v => {
-      console.log('[child] emitting search:', v);   // TEMP: should print as you type
       this.search.emit(v);
     });
   }

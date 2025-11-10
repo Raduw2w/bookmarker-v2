@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./error-banner.component.scss'],
 })
 export class ErrorBannerComponent {
-  @Input() message = '';
-  @Input() retry?: () => void;
+  message = input<string>('');
+  retry = input<(() => void) | undefined>();
 }

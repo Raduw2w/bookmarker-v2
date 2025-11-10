@@ -4,6 +4,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { HighlightFusePipe } from './shared/pipes/highlight-fuse.pipe';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
   imports: [
     RouterOutlet,
     // RouterLink,
+    HighlightFusePipe,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,

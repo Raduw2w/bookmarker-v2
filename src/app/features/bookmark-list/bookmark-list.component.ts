@@ -102,8 +102,8 @@ export class BookmarkListComponent implements OnInit {
   olderCollapsed = signal(false);
 
   private destroyRef = inject(DestroyRef);
-
-  constructor(private store: Store, private dialog: MatDialog) {}
+  private store = inject(Store);
+  private dialog = inject(MatDialog);
 
   ngOnInit(): void {
     this.store.dispatch(BookmarksActions.load());

@@ -1,14 +1,15 @@
 <!-- app.html -->
-  <mat-toolbar class="navbar">
-    <a routerLink="/" class="brand" aria-label="Go to homepage">
-      <span class="title">Bookmarker</span>
-    </a>
-  </mat-toolbar>
+<mat-toolbar class="navbar">
+  <a routerLink="/" class="brand" aria-label="Go to homepage">
+    <span class="title">Bookmarker</span>
+  </a>
+</mat-toolbar>
 
-  <main class="container">
-    <router-outlet></router-outlet>
-  </main>
+<main class="container">
+  <router-outlet></router-outlet>
+</main>
 
-  <footer class="footer">
-    <span>© 2025 Bookmarker</span>
-  </footer>
+<footer class="footer">
+  ©<span [innerHTML]="'2025' | highlightFuse : [[0, 3]]"></span><span> Bookmarker</span>
+  <!-- <span [innerHTML]="'TEST' | highlightFuse : [[0,2]]"></span> -->
+</footer>

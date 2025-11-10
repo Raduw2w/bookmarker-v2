@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,12 +21,8 @@ export interface ConfirmDialogData {
   templateUrl: './confirm-dialog.component.html'
 })
 export class ConfirmDialogComponent {
-  isDanger: boolean;
-
-  constructor(
-    public ref: MatDialogRef<ConfirmDialogComponent, boolean>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
-  ) {
-    this.isDanger = (data?.variant ?? 'default') === 'danger';
-  }
+  ref = inject(MatDialogRef<ConfirmDialogComponent, boolean>);
+  data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
+  
+  isDanger = (this.data?.variant ?? 'default') === 'danger';
 }
